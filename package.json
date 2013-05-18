@@ -7,8 +7,9 @@
   "dependencies": {
     "mongodb":"1.2.14",
     "monk": "0.7.1",
-    "express": "3.1.0",
-    "mocha": "latest",
-    "should":"latest"
+    "express": "3.1.0",  
+  	"q": "latest",  
+  	"mocha": "latest",
+    "chai":"latest"  
   }
 }
