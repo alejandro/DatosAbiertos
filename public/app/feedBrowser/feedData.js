@@ -5,7 +5,13 @@ define(['server'],function(server){
 		return {
 			getAll: function(){
 				return api.get("feeds");
-			}
+			},
+			getById: function(id){
+				return api.get("feeds/"+id);
+			},
+			create: function(newFeed){
+				return api.post("feeds", newFeed);
+			}			
 		};
 	}(server);
 	

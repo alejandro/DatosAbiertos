@@ -14,8 +14,8 @@ define(['durandal/app', 'durandal/system', 'durandal/viewLocator'],
         //Replace 'viewmodels' in the moduleId with 'views' to locate the view.
         //Look for partial views in a 'views' folder in the root.
         viewLocator.useConvention();
-
-        app.adaptToDevice();
-        app.setRoot('viewModels/feeds');
+		
+		app.adaptToDevice();
+        app.setRoot('feedBrowser/shell');
     });
 });

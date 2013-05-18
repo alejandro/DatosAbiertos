@@ -21,9 +21,9 @@ app.get('/', function(req, res) {
 var feedModule = require("./modules/feeds");
 
 app.get('/feeds', function(req, res) {
-	feedModule.getAll().success(function(feeds) {
+	feedModule.getAll().then(function(feeds) {
 		res.json(feeds);
-	}).error(function(err) {
+	}).fail(function(err) {
 		res.json({
 			Err : err
 		});
@@ -31,7 +31,13 @@ app.get('/feeds', function(req, res) {
 });
 
 app.get('/feeds/:id', function(req, res) {
-
+	feedModule.get(req.params["id"]).then(function(feed) {
+		res.json(feed);
+	}).fail(function(err) {
+		res.json({
+			Err : err
+		});
+	});
 });
 
 database.connect("DatosAbiertos").then(function() {

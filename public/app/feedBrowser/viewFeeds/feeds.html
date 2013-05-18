@@ -1,0 +1,10 @@
+<div>
+	<h1>Feeds</h1>
+	<ul data-bind="foreach: feeds">
+		<li>
+			<a data-bind="attr: {href:'/#/feeds/' + _id}"><span data-bind="html: Name"></span></a>
+		</li>
+	</ul>
+	
+	<button data-bind="click: createFeed">New Feed</button>
+</div>
