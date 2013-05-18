@@ -1,7 +1,7 @@
 var mongo = require('mongodb');
 var express = require('express');
 var app = new express();
-var database = require("../modules/database.js");
+var database = require("./modules/database.js");
 
 DEBUG = "monk:*"
 //DEBUG="monk:queries"
