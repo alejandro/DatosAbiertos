@@ -35,6 +35,12 @@ define(['config'],function(config){
                 data: data
             });
 
+			promise.fail(function(err){
+				if(err.status == 401){
+					window.location = config.loginPage;
+				}	
+			});
+			
             //error handling
             promise.then(function (response, textStatus, jqXhr) {
                 if (response && response.Status == "error") {

@@ -3,10 +3,23 @@
 var passport = require('passport'), GoogleStrategy = require('passport-google').Strategy, accounts = require('./modules/accounts');
 var config = require("./config");
 
-var strategy = new GoogleStrategy({
+var googleAuthConfig = {
 	returnURL : config.baseUrl + '/login/return',
 	realm : config.baseUrl
-}, login);
+};
+
+var strategy = new GoogleStrategy(googleAuthConfig, validateUser);
+
+function validateUser(identifier, profile, done) {
+	var email = profile.emails[0].value;
+	getAccount(email, done).fail(function(err) {
+		if (err == "not found") {
+			accounts.create(email, profile.displayName, profile.name.givenName, profile.name.familyName).then(function(newAccount) {
+				done(null, newAccount);
+			});
+		}
+	});
+};
 
 passport.use(strategy);
 
@@ -15,23 +28,20 @@ passport.serializeUser(function(account, done) {
 });
 
 passport.deserializeUser(function(email, done) {
-	accounts.getByEmail(email).then(function(account) {
-		done(null, account);
-	});
+	getAccount(email, done);
 });
 
-function login(identifier, profile, done) {
-	var email = profile.emails[0].value;
-	accounts.getByEmail(email).then(function(account) {
+function getAccount(email, done) {
+	return accounts.getByEmail(email).then(function(account) {
 		done(null, account);
 	});
-}
+};
 
 function restrict(req, res, next) {
-	if (req.isAuthenticated()) {
+	if (req.isAuthenticated() == true) {
 		next();
 	} else {
-		res.redirect('/#/login');
+		res.send('Authentication required to access that feature.', 401);
 	}
 }
 
@@ -40,4 +50,4 @@ exports.authenticateWithGoogle = passport.authenticate("google", {
 	successRedirect : '/#/'
 });
 exports.restrict = restrict;
-exports.passport = passport; 
+exports.passport = passport;

@@ -2,7 +2,7 @@ var auth = require('../auth');
 
 module.exports.init = function(app) {
 	app.get('/login/google', auth.authenticateWithGoogle);
-	app.get('/login/return', function(req, res) {
+	app.get('/login/return', auth.authenticateWithGoogle, function(req, res) {
 		res.redirect('/#/');
 	});
 

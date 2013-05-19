@@ -4,8 +4,9 @@ define(function(){
 		
 		
 		return {
-			apiBaseUrl : 'http://localhost:3000/'
-			//apiBaseUrl : 'http://datosabiertoshn.aws.af.cm/' 
+			apiBaseUrl : 'http://localhost:3000/',
+			//apiBaseUrl : 'http://datosabiertoshn.aws.af.cm/',
+			loginPage: "/#/login"
 		};
 	}();
 	
