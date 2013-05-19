@@ -1,3 +1,5 @@
+"use strict";
+
 var database = require("../modules/database.js");
 var should = require('chai').should();
 
@@ -49,6 +51,18 @@ describe('Database', function() {
 				all.should.be.an.instanceOf(Array);
 				all.length.should.equal(1);
 				all[0].Name.should.equal(john.Name);				
+			}).done(done);
+		});
+		
+		it('should be able to retrieve the first record that matches', function(done){
+			col.getFirst({Name:john.Name}).then(function(first){
+				first.Name.should.equal(john.Name);				
+			}).done(done);
+		});
+		
+		it('should fail if it cannot find the first record that matches', function(done){
+			col.getFirst({Name:"some other name"}).fail(function(err){
+				err.should.equal("not found");
 			}).done(done);
 		});
 		

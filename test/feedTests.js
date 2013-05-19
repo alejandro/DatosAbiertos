@@ -1,3 +1,5 @@
+"use strict";
+
 var feedModule = require("../modules/feeds.js");
 var should = require('chai').should();
 var database = require("../modules/database.js");

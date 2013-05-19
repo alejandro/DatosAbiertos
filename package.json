@@ -6,7 +6,8 @@
   },
   "dependencies": {
     "mongodb":"1.2.14",
-    "monk": "0.7.1",
+    "passport": "0.1.17",    
+    "passport-google": "0.3.0",
     "express": "3.1.0",  
   	"q": "latest",  
   	"mocha": "latest",

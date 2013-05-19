@@ -1,46 +1,31 @@
+"use strict";
+
 var mongo = require('mongodb');
 var express = require('express');
 var app = new express();
 var database = require("./modules/database.js");
+var auth = require('./auth');
+var routes = require("./routes");
 
-DEBUG = "monk:*"
-//DEBUG="monk:queries"
-
-app.configure(function() {
-	app.use(express.static(__dirname + '/public'));
-	app.use(express.logger('dev'));
-	app.set('port', process.env.PORT || 3000);
-});
-
-app.get('/', function(req, res) {
-	db.driver.admin.listDatabases(function(e, dbs) {
-		res.json(dbs);
-	});
-});
-
-var feedModule = require("./modules/feeds");
-
-app.get('/feeds', function(req, res) {
-	feedModule.getAll().then(function(feeds) {
-		res.json(feeds);
-	}).fail(function(err) {
-		res.json({
-			Err : err
-		});
-	});
-});
-
-app.get('/feeds/:id', function(req, res) {
-	feedModule.get(req.params["id"]).then(function(feed) {
-		res.json(feed);
-	}).fail(function(err) {
-		res.json({
-			Err : err
-		});
-	});
-});
-
+console.log("Starting app...");
 database.connect("DatosAbiertos").then(function() {
+	console.log("Database connected.");
+	app.configure(function() {
+		app.use(express.static(__dirname + '/public'));
+		app.use(express.logger('dev'));
+		app.set('port', process.env.PORT || 3000);
+		app.use(express.cookieParser());
+		app.use(express.session({
+			secret : 'cafe el gringo'
+		}));
+		app.use(auth.passport.initialize());
+		app.use(auth.passport.session());
+	});
+	console.log("App configured.");
+
+	routes.init(app);
+	console.log("Routes initialized.");
+	
 	app.listen(app.get('port'), function() {
 		console.log("DatosAbiertos API Server listening on port " + app.get('port'));
 	});

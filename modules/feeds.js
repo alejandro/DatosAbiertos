@@ -1,3 +1,5 @@
+"use strict";
+
 var database = require("../modules/database.js");
 var feeds = "feeds";
 

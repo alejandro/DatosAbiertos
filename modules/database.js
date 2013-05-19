@@ -1,3 +1,5 @@
+"use strict";
+
 var q = require("q"), mongo = require('mongodb'), Server = mongo.Server, Db = mongo.Db, BSON = mongo.BSONPure;
 
 var database = function() {
@@ -6,6 +8,8 @@ var database = function() {
 		auto_reconnect : true
 	});
 
+	var db;
+	
 	var openDb = function(dbName) {
 		var def = q.defer();
 		db = new Db(dbName, server, {
@@ -58,9 +62,9 @@ var database = function() {
 					if (err) {
 						def.reject(err);
 					} else {
-						getById(id).done(function(doc){
-							def.resolve(doc);	
-						});						
+						getById(id).done(function(doc) {
+							def.resolve(doc);
+						});
 					}
 				});
 				return def.promise;
@@ -114,6 +118,30 @@ var database = function() {
 								def.reject(err);
 							} else {
 								def.resolve(items);
+							}
+						});
+					}
+				});
+				return def.promise;
+			};
+
+			CollectionWithPromise.prototype.getFirst = function(query) {
+				var def = q.defer();
+				var query = query || {};
+				coll.find(query, function(err, cursor) {
+					if (err) {
+						def.reject(err);
+					} else {
+						cursor.toArray(function(err, items) {
+							if (err) {
+								def.reject(err);
+							} else {
+								if (items.length > 0) {
+									def.resolve(items[0]);
+								}else
+								{
+									def.reject("not found");
+								}
 							}
 						});
 					}
