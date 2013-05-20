@@ -13,6 +13,7 @@ database.connect("DatosAbiertos").then(function() {
 	app.configure(function() {
 		app.use(express.static(__dirname + '/public'));
 		app.use(express.logger('dev'));
+		app.use(express.bodyParser());
 		app.set('port', process.env.PORT || 3000);
 		app.use(express.cookieParser());
 		app.use(express.session({

@@ -16,4 +16,10 @@ module.exports.init = function(app) {
 			res.json(feed);
 		});
 	});
+	
+	app.post('/feeds', auth.restrict, function(req, res){
+		feedModule.create(req.body.name).done(function(){
+			res.json({status:'ok'});
+		});
+	});
 };

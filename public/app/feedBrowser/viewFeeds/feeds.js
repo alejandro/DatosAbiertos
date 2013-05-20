@@ -4,21 +4,26 @@ define(['feedBrowser/feedData', 'durandal/app'], function(feedData, app) {
 
 		var feeds = ko.observableArray();
 
-		data.getAll().done(function(feedsFromServer) {
-			_.each(feedsFromServer, function(feed) {
-				feeds.push(feed);
+		var loadFeeds = function() {
+			feeds.removeAll();
+			return data.getAll().done(function(feedsFromServer) {
+				_.each(feedsFromServer, function(feed) {
+					feeds.push(feed);
+				});
 			});
-		});
+		};
 
 		return {
 			feeds : feeds,
-			createFeed: function(){				
-				app.showModal('feedBrowser/createFeed/create').then(function(newFeed){					
-					feeds.push(newFeed);
+			createFeed : function() {
+				app.showModal('feedBrowser/createFeed/create').then(function(newFeed) {
+					loadFeeds();
 				});
 			},
 			activate : function() {
-				app.showMessage("Hello world", "Welcome");
+				return loadFeeds();
+			},
+			viewAttached : function() {				
 			}
 		};
 
