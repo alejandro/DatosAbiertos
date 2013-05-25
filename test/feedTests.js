@@ -98,10 +98,11 @@ describe('Feeds', function() {
 
 	describe('when creating a feed', function() {
 		it('should create the feed in the database', function(done) {
-			feedModule.create("New Feed").then(function(newFeed) {
+			feedModule.create("New Feed", org1._id).then(function(newFeed) {
 				database.collection("feeds").then(function(col) {
 					col.getById(newFeed._id).then(function(feedFromDatabase) {
 						feedFromDatabase.name.should.equal("New Feed");
+						feedFromDatabase.orgId.should.equal(org1._id.toString());
 					}).done(done);
 				});
 			});

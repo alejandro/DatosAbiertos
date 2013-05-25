@@ -35,10 +35,11 @@ var mod = function() {
 		});
 	};
 
-	var create = function(name) {
+	var create = function(name, orgId) {
 		return getCollection().then(function(col) {
 			return col.add({
-				name : name
+				name : name,
+				orgId: orgId.toString()
 			});
 		});
 	};
