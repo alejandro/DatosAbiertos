@@ -40,7 +40,7 @@ function getAccount(email, done) {
 function restrict(req, res, next) {
 	if (req.isAuthenticated() == true) {
 		next();
-	} else {
+	} else {		
 		res.send('Authentication required to access that feature.', 401);
 	}
 }

@@ -1,7 +1,7 @@
 define(['durandal/plugins/router'], function (router) {
     
     return {
-        router: router,
+    	router: router,
         activate: function () {
             router.map([
                 { url: 'feeds', moduleId: 'feedBrowser/viewFeeds/feeds', name: 'Public Feeds', visible: true },

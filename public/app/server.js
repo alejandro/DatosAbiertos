@@ -1,4 +1,4 @@
-define(['config'],function(config){
+define(['config', 'durandal/plugins/router'],function(config, router){
 		
 	var server = function(){
 	
@@ -37,7 +37,8 @@ define(['config'],function(config){
 
 			promise.fail(function(err){
 				if(err.status == 401){
-					window.location = config.loginPage;
+					console.log("Got a 401... redirecting to the login page.");
+					router.navigateToRoute(config.loginPage);
 				}	
 			});
 			
