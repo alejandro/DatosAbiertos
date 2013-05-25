@@ -15,6 +15,12 @@ var mod = function() {
 		});
 	};
 
+	var getAllByOrgId = function(orgId) {
+		return getCollection().then(function(col) {
+			return col.getAll({orgId: orgId.toString()});
+		});
+	};
+
 	var getOne = function(id) {
 		return getCollection().then(function(col) {
 			return col.getById(id);
@@ -37,18 +43,21 @@ var mod = function() {
 		});
 	};
 
-	var correctName = function(id, correctedName){
-		return getCollection().then(function(col){
-			return col.modify(id, {name: correctedName});
-		});	
+	var correctName = function(id, correctedName) {
+		return getCollection().then(function(col) {
+			return col.modify(id, {
+				name : correctedName
+			});
+		});
 	};
-	
+
 	return {
 		getAll : getAll,
+		getAllByOrgId : getAllByOrgId,
 		get : getOne,
 		archive : archive,
 		create : create,
-		correctName: correctName
+		correctName : correctName
 	};
 }();
 
