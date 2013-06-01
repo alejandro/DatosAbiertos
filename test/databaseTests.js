@@ -2,13 +2,14 @@
 
 var database = require("../modules/database.js");
 var should = require('chai').should();
+var q = require("q");
 
 describe('Database', function() {
 
 	describe('when connecting to the database', function() {
 		it('should connect successfully', function() {			
 			database.isConnected().should.be.true;	
-			database.currentConnection.should.be.a('function');																		
+			database.currentConnection.should.be.a('function');																	
 		});
 	});
 	
@@ -73,6 +74,21 @@ describe('Database', function() {
 			}).done(done);
 		});
 		
+		it('should fail if the given id is invalid', function(done){
+			var invalidId = "some invalid id";
+			col.getById(invalidId).fail(function(err){
+				err.should.equal("There was a problem with the provided Id '" + invalidId + "'. Cannot be converted to BSON Id.");
+			}).done(done);				
+		});
+		
+		it('should fail if it cant find an item by the given id', function(done){
+			var bson = require('mongodb').BSONPure;
+			var nonExistentId = new bson.ObjectID();
+			col.getById(nonExistentId).fail(function(err){
+				err.should.equal("Could not find the record with id " + nonExistentId + ".");
+			}).done(done);				
+		});
+		
 		it('should be able to add an item', function(done){
 			col.add({Name:"David"}).then(function(createdItem){
 				createdItem._id.should.not.be.null;
@@ -84,18 +100,26 @@ describe('Database', function() {
 			});
 		});
 		
-		it('should be able to remove an item by id', function(done){
+		it('should be able to remove an item by string id', function(done){
+			col.remove(john._id.toString()).then(function(removedItem){
+				col.getById(john._id).fail(function(err){
+					err.should.equal("Could not find the record with id " + john._id.toString() + ".");
+				}).done(done);
+			});
+		});
+		
+		it('should be able to remove an item by BSON id', function(done){
 			col.remove(john._id).then(function(removedItem){
-				col.getById(john._id).then(function(itemInDatabase){
-					(itemInDatabase==null).should.be.true;
+				col.getById(john._id).fail(function(err){
+					err.should.equal("Could not find the record with id " + john._id.toString() + ".");
 				}).done(done);
 			});
 		});
 		
 		it('should be able to remove items by query', function(done){
 			col.remove({Name:sam.Name}).then(function(removedItem){
-				col.getById(sam._id).then(function(itemInDatabase){
-					(itemInDatabase==null).should.be.true;
+				col.getById(sam._id).fail(function(err){
+					err.should.equal("Could not find the record with id " + sam._id.toString() + ".");
 				}).done(done);
 			});
 		});
@@ -107,5 +131,45 @@ describe('Database', function() {
 				}).done(done);
 			});
 		});
+		
+		it('should be able to insert to different collections in the same instance', function(done){
+			var fruit = {name:"apple"};
+			var vehicle = {type:"truck"};
+			
+			//add to fruits collection
+			database.collection("fruits").then(function(f_coll){
+				return f_coll.add(fruit);
+			
+			}).then(function(){
+					
+				//add to vehicles collection
+				return database.collection("vehicles").then(function(v_coll){					
+					return v_coll.add(vehicle);
+				});
+				
+			}).then(function(){
+				var def = q.defer();	
+				database.currentConnection().collection("vehicles", function(err, coll) {			
+					coll.findOne({ '_id' : vehicle._id }, function(err, doc) {
+							doc.type.should.equal(vehicle.type);
+							def.resolve();
+						});
+				});
+				return def.promise;
+			
+			}).then(function(){
+				var def = q.defer();	
+				database.currentConnection().collection("fruits", function(err, coll) {			
+					coll.findOne({ '_id' : fruit._id }, function(err, doc) {
+							doc.name.should.equal(fruit.name);
+							def.resolve();
+						});
+				});
+				return def.promise;
+			}).then(done);
+			
+		});
+		
+		
 	});	
 });

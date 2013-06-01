@@ -12,7 +12,7 @@ var mod = function() {
 	var getByEmail = function(email) {
 		return getCollection().then(function(col) {
 			return col.getFirst({
-				email: email
+				email : email
 			});
 		});
 	};
@@ -21,16 +21,29 @@ var mod = function() {
 		return getCollection().then(function(col) {
 			return col.add({
 				email : email,
-				displayName: displayName,
-				firstName: firstName,
-				lastName: lastName				
+				displayName : displayName,
+				firstName : firstName,
+				lastName : lastName
+			});
+		});
+	};
+
+	var addOrg = function(accountId, org) {
+		return getCollection().then(function(col) {
+			return col.getById(accountId).then(function(account) {
+				var orgIds = account.orgs || [];
+				orgIds.push(org._id.toString());
+				return col.modify(accountId, {
+					orgs : orgIds
+				});
 			});
 		});
 	};
 
 	return {
 		getByEmail : getByEmail,
-		create : create
+		create : create,
+		addOrg : addOrg
 	};
 }();
 

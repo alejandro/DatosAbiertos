@@ -9,7 +9,7 @@ var database = function() {
 	});
 
 	var db;
-	
+
 	var openDb = function(dbName) {
 		var def = q.defer();
 		db = new Db(dbName, server, {
@@ -35,15 +35,26 @@ var database = function() {
 
 			var getById = function(id) {
 				var def = q.defer();
-				coll.findOne({
-					'_id' : new BSON.ObjectID(id.toString())
-				}, function(err, doc) {
-					if (err) {
-						def.reject(err);
-					} else {
-						def.resolve(doc);
-					}
-				});
+				var bsonId;
+				try {
+
+					bsonId = new BSON.ObjectID(id.toString());
+				} catch(err) {
+					def.reject("There was a problem with the provided Id '" + id + "'. Cannot be converted to BSON Id.");
+				}
+				if (bsonId) {
+					coll.findOne({
+						'_id' : bsonId
+					}, function(err, doc) {
+						if (err) {
+							def.reject(err);
+						} else if (doc == null) {
+							def.reject("Could not find the record with id " + id + ".");
+						} else {
+							def.resolve(doc);
+						}
+					});
+				}
 				return def.promise;
 			};
 
@@ -73,8 +84,16 @@ var database = function() {
 			CollectionWithPromise.prototype.remove = function(idOrQuery) {
 				var def = q.defer();
 				var query = idOrQuery;
-				if (idOrQuery.constructor == Object) {
+
+				var isBsonObjectId = idOrQuery.toHexString;
+				var isJsObject = idOrQuery.constructor == Object;
+
+				if (isJsObject) {
 					query = idOrQuery;
+				} else if (isBsonObjectId) {
+					query = {
+						'_id' : idOrQuery
+					}
 				} else {
 					query = {
 						'_id' : new BSON.ObjectID(idOrQuery.toString())
@@ -138,8 +157,7 @@ var database = function() {
 							} else {
 								if (items.length > 0) {
 									def.resolve(items[0]);
-								}else
-								{
+								} else {
 									def.reject("not found");
 								}
 							}

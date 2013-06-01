@@ -49,19 +49,12 @@ describe('Feeds', function() {
 	});
 
 	afterEach(function(done) {
-		var deleteAllOrgs = function(callback) {
-			database.currentConnection().collection("orgs", function(err, coll) {
+		var deleteAll = function(collectionName, callback) {
+			database.currentConnection().collection(collectionName, function(err, coll) {
 				coll.remove({}, callback);
 			});
-		}
-		var deleteAllFeeds = function(callback) {
-			database.currentConnection().collection("feeds", function(err, coll) {
-				coll.remove({}, {
-					safe : true
-				}, callback);
-			});
-		}
-		deleteAllOrgs(deleteAllFeeds(done));
+		}		
+		deleteAll("orgs", deleteAll("feeds", done));
 	});
 
 	describe('when getting a list of feeds', function() {
