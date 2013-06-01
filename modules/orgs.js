@@ -17,12 +17,15 @@ var mod = function() {
 		});
 	};
 
-	var create = function(name, firstAdminAccountId) {		
+	var create = function(name, firstAdminAccountId) {
 		var def = q.defer();
-		var orgToAdd = { name : name, admins : [firstAdminAccountId.toString()] };
+		var orgToAdd = {
+			name : name,
+			admins : [firstAdminAccountId.toString()]
+		};
 		getCollection().then(function(col) {
 			col.add(orgToAdd).then(function(newOrg) {
-				accounts.addOrg(firstAdminAccountId, newOrg).then(function(){
+				accounts.addOrg(firstAdminAccountId, newOrg).then(function() {
 					def.resolve(newOrg);
 				});
 			});
@@ -30,9 +33,18 @@ var mod = function() {
 		return def.promise;
 	};
 
+	var getAllForAccount = function(accountId) {
+		return getCollection().then(function(coll){
+			return coll.getAll({
+				admins : accountId.toString() 
+			});
+		});
+	};
+	
 	return {
 		getById : getById,
-		create : create
+		create : create,
+		getAllForAccount : getAllForAccount
 	};
 }();
 
