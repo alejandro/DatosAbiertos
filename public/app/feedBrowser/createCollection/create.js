@@ -1,4 +1,4 @@
-define(['feedBrowser/feedData', 'durandal/app'], function(feedData, app) {
+define(function() {
 
 	var viewModel = function() {
 		
@@ -7,8 +7,8 @@ define(['feedBrowser/feedData', 'durandal/app'], function(feedData, app) {
 		var closeModal = function(){};
 		
 		var create = function(){
-			var newFeed = {name: name()};
-			closeModal(newFeed);
+			var newCollection = {name: name()};
+			closeModal(newCollection);
 		};
 		
 		return {
@@ -16,8 +16,8 @@ define(['feedBrowser/feedData', 'durandal/app'], function(feedData, app) {
 			create: create,	
 			activate : function() { 
 				var self = this;	
-				closeModal = function(feed){
-					self.modal.close(feed);
+				closeModal = function(newCollection){
+					self.modal.close(newCollection);
 				}			
 			}
 		};

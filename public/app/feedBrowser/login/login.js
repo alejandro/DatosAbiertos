@@ -1,7 +1,7 @@
 define(function() {
 
 	var viewModel = function() {
-		debugger;
+		
 		return {};
 	}();
 

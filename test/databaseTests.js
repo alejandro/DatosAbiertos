@@ -16,9 +16,9 @@ describe('Database', function() {
 	describe('when retrieving collection data', function(){
 		
 		var col = null;
-		var john = { Name: "John"};
-		var sam = { Name: "Sam" };
-		var eva = { Name: "Eva" };
+		var john = { Name: "John", Age: 56 };
+		var sam = { Name: "Sam", Age: 23 };
+		var eva = { Name: "Eva", Age: 32 };
 		
 		beforeEach(function(done){
 			database.collection("test").then(function(c){ 
@@ -128,8 +128,13 @@ describe('Database', function() {
 			col.modify(eva._id, {Name: "Eva Modified"}).then(function(modifiedItem){
 				col.getById(eva._id).then(function(itemInDatabase){
 					itemInDatabase.Name.should.equal("Eva Modified");
+					itemInDatabase.Age.should.equal(eva.Age);
 				}).done(done);
 			});
+		});
+		
+		it('should be able to provide a new unique database id', function(){
+			database.newId().should.not.be.null;				
 		});
 		
 		it('should be able to insert to different collections in the same instance', function(done){

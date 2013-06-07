@@ -48,7 +48,7 @@ describe('Orgs', function() {
 		};
 
 		deleteAll("orgs", deleteAll("accounts", function() {
-			createTestData().done(function(){
+			createTestData().done(function() {
 				done();
 			});
 		}));
@@ -62,17 +62,25 @@ describe('Orgs', function() {
 		});
 	});
 
-	describe('when getting all orgs for an account', function() {		
-		it('should return the expected orgs where account is an admin', function(done) {			
-			orgModule.create("org1", account1._id).done(function(newOrg1){
-				orgModule.create("org2", account1._id).done(function(newOrg2){					
-					orgModule.getAllForAccount(account1._id.toString()).then(function(orgs){
+	describe('when getting all orgs for an account', function() {
+		it('should return the expected orgs where account is an admin', function(done) {
+			orgModule.create("org1", account1._id).done(function(newOrg1) {
+				orgModule.create("org2", account1._id).done(function(newOrg2) {
+					orgModule.getAllForAccount(account1._id.toString()).then(function(orgs) {
 						orgs[0].name.should.equal(newOrg1.name);
 						orgs[1].name.should.equal(newOrg2.name);
 						orgs.length.should.equal(2);
-					}).done(done);					
+
+						database.collection("accounts").then(function(col) {
+							return col.getById(account1._id).then(function(accountInDatabase) {
+								accountInDatabase._id.toString().should.equal(account1._id.toString());
+								accountInDatabase.orgs.should.include(newOrg1._id.toString());
+								accountInDatabase.email.should.equal("byron@acklenavenue.com");
+							}).done(done);
+						});
+					});
 				});
-			})			
+			})
 		});
 	});
 

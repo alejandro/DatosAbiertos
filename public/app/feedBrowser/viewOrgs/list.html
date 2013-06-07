@@ -1,0 +1,10 @@
+<div>
+	<h1>Orgs</h1>
+	<ul data-bind="foreach: orgs">
+		<li>
+			<a data-bind="attr: {href:'/#/orgs/' + _id}"><span data-bind="html: name"></span></a>
+		</li>
+	</ul>
+	
+	<button data-bind="click: create">New Org</button>
+</div>

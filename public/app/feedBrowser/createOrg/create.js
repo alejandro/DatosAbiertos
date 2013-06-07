@@ -1,4 +1,4 @@
-define(['feedBrowser/feedData', 'durandal/app'], function(feedData, app) {
+define(['feedBrowser/orgData', 'durandal/app'], function(orgData, app) {
 
 	var viewModel = function() {
 		
@@ -7,8 +7,10 @@ define(['feedBrowser/feedData', 'durandal/app'], function(feedData, app) {
 		var closeModal = function(){};
 		
 		var create = function(){
-			var newFeed = {name: name()};
-			closeModal(newFeed);
+			var newOrg = {name: name()};
+			orgData.create(newOrg).then(function(){
+				closeModal(newOrg);
+			});
 		};
 		
 		return {

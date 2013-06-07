@@ -25,6 +25,10 @@ var database = function() {
 		return def.promise;
 	};
 
+	var newId = function(){
+		return BSON.ObjectID();
+	};
+	
 	var CollectionWithPromise = ( function() {
 
 			var coll = null;
@@ -66,7 +70,7 @@ var database = function() {
 				var def = q.defer();
 				coll.update({
 					_id : new BSON.ObjectID(id.toString())
-				}, modification, {
+				}, {$set: modification}, {
 					upsert : false,
 					safe : true
 				}, function(err, recordsUpdate) {
@@ -188,6 +192,7 @@ var database = function() {
 				currentConn = db;
 			});
 		},
+		newId: newId,
 		collection : function(collectionName) {
 			var def = q.defer();
 			db.collection(collectionName, function(err, coll) {

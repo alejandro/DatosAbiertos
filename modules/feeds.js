@@ -2,6 +2,7 @@
 
 var database = require("../modules/database.js");
 var feeds = "feeds";
+var q = require("q");
 
 var mod = function() {
 
@@ -17,7 +18,9 @@ var mod = function() {
 
 	var getAllByOrgId = function(orgId) {
 		return getCollection().then(function(col) {
-			return col.getAll({orgId: orgId.toString()});
+			return col.getAll({
+				orgId : orgId.toString()
+			});
 		});
 	};
 
@@ -39,7 +42,7 @@ var mod = function() {
 		return getCollection().then(function(col) {
 			return col.add({
 				name : name,
-				orgId: orgId.toString()
+				orgId : orgId.toString()
 			});
 		});
 	};
@@ -52,13 +55,37 @@ var mod = function() {
 		});
 	};
 
+	var addCollection = function(feedId, collectionName) {
+		
+		if(!collectionName || collectionName==null){
+			var def = q.defer();
+			def.reject("Validation error! Must include name when creating a collection.");
+			return def.promise;
+		}
+		
+		return getCollection().then(function(col) {
+			return col.getById(feedId).then(function(feed) {
+				var collections = feed.collections || [];
+				collections.push({
+					_id : database.newId(),
+					name : collectionName
+				});
+
+				return col.modify(feedId, {
+					collections : collections
+				});
+			});
+		});
+	};
+
 	return {
 		getAll : getAll,
 		getAllByOrgId : getAllByOrgId,
 		get : getOne,
 		archive : archive,
 		create : create,
-		correctName : correctName
+		correctName : correctName,
+		addCollection : addCollection
 	};
 }();
 

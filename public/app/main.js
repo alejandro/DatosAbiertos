@@ -1,6 +1,6 @@
 ﻿requirejs.config({
     paths: {
-        'text': 'durandal/amd/text'
+        'text': 'durandal/amd/text'        
     }
 });
 
@@ -11,11 +11,8 @@ define(['durandal/app', 'durandal/system', 'durandal/viewLocator'],
     
     app.title = 'Datos Abiertos';
     app.start().then(function () {
-        //Replace 'viewmodels' in the moduleId with 'views' to locate the view.
-        //Look for partial views in a 'views' folder in the root.
-        viewLocator.useConvention();
-		
+        viewLocator.useConvention();		
 		app.adaptToDevice();
-        app.setRoot('feedBrowser/shell');
+        app.setRoot('feedBrowser/shell', 'entrance');
     });
 });

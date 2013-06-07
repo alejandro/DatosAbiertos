@@ -113,4 +113,26 @@ describe('Feeds', function() {
 			});
 		});
 	});
+	
+	describe("when adding a collection to a feed", function() {
+		it("should add the collection in the database", function(done) {
+			feedModule.addCollection(feed3._id, "collection name").then(function(modifiedFeed) {
+				database.collection("feeds").then(function(col) {
+					col.getById(modifiedFeed._id).then(function(feedFromDatabase) {
+						feedFromDatabase.collections[0].name.should.equal("collection name");
+						feedFromDatabase.collections[0]._id.should.not.be.null;
+					}).done(done);
+				});
+			});
+		});
+	});
+	
+	describe("when adding a collection to a feed without a name", function() {
+		var nothing;
+		it("should throw an exception", function(done) {
+			feedModule.addCollection(feed3._id, nothing).fail(function(err){
+				err.should.equal("Validation error! Must include name when creating a collection.");				
+			}).done(done);			
+		});
+	});
 })

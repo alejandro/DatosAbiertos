@@ -19,6 +19,7 @@ define(['config', 'durandal/plugins/router'],function(config, router){
         };
 
         var sendAjaxRequest = function (type, resource, data) {
+            
             var operator = "?";
             if (resource.indexOf("?") !== -1) {
                 operator = "&";
@@ -38,7 +39,9 @@ define(['config', 'durandal/plugins/router'],function(config, router){
 			promise.fail(function(err){
 				if(err.status == 401){
 					console.log("Got a 401... redirecting to the login page.");
-					router.navigateToRoute(config.loginPage);
+					require('authChecker').authFailed().done(function(){
+						router.navigateToRoute(config.loginPage);	
+					});					
 				}	
 			});
 			
@@ -58,6 +61,7 @@ define(['config', 'durandal/plugins/router'],function(config, router){
             });
 
             return promise;
+            	                   
         };
 
 		return {

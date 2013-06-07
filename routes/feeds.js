@@ -16,10 +16,12 @@ module.exports.init = function(app) {
 			res.json(feed);
 		});
 	});
-	
-	app.post('/feeds', auth.restrict, function(req, res){
-		feedModule.create(req.body.name).done(function(){
-			res.json({status:'ok'});
+
+	app.post('/feeds/:feedId/collections', function(req, res) {
+		feedModule.addCollection(req.params["feedId"], req.body.name).then(function() {
+			res.json({
+				status : 'ok'
+			});
 		});
 	});
 };
