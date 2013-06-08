@@ -44,4 +44,12 @@ module.exports.init = function(app) {
 			});
 		});
 	});
+	
+	app.post('/orgs/:orgId/applications', function(req, res) {
+		orgModule.addApplication(req.params["orgId"], req.body.name).then(function() {
+			res.json({
+				status : 'ok'
+			});
+		});
+	});	
 };

@@ -41,10 +41,27 @@ var mod = function() {
 		});
 	};
 	
+	var addApplication = function(orgId, applicationsName){
+		return getCollection().then(function(col) {
+			return col.getById(orgId).then(function(org) {
+				var applications = org.applications || [];
+				applications.push({
+					_id : database.newId(),
+					name : applicationsName
+				});
+
+				return col.modify(orgId, {
+					applications : applications
+				});
+			});
+		});
+	};
+	
 	return {
 		getById : getById,
 		create : create,
-		getAllForAccount : getAllForAccount
+		getAllForAccount : getAllForAccount,
+		addApplication: addApplication
 	};
 }();
 

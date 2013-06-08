@@ -16,6 +16,14 @@ define(['server'], function(server) {
 				return api.post("orgs/" + orgId + "/feeds", {
 					name : name
 				});
+			},
+			getApplications : function(orgId) {
+				return api.get("orgs/" + orgId + "/applications");
+			},
+			addApplication : function(name, orgId) {
+				return api.post("orgs/" + orgId + "/applications", {
+					name : name
+				});
 			}
 		};
 	}(server);
