@@ -19,6 +19,16 @@ define(['durandal/app','durandal/plugins/router', 'authChecker'],
 					visible : true
 				},
 				{
+					url : 'feeds/:feedId',
+					moduleId : 'feedBrowser/viewFeed/feed',
+					name : 'View Feeds'
+				},
+				{
+					url : 'feeds/:feedId/collections/:collectionId',
+					moduleId : 'feedBrowser/viewCollection/view',
+					name : 'View Collections'
+				},
+				{
 					url : 'login',
 					moduleId : 'feedBrowser/login/login',
 					name : 'Login',
@@ -29,11 +39,7 @@ define(['durandal/app','durandal/plugins/router', 'authChecker'],
 				// { url: 'widgets', moduleId: 'samples/widgets/index', name: 'Widgets', visible: true },
 				// { url: 'master-detail', moduleId: 'samples/masterDetail/index', name: 'Master Detail', visible: true },
 				// { url: 'knockout-samples', moduleId: 'samples/knockout/index', name: 'Knockout Samples', visible: true },
-				{
-					url : 'feeds/:id',
-					moduleId : 'feedBrowser/viewFeed/feed',
-					name : 'View Public Feed'
-				}]);
+				]);
 
 				// authChecker.check().done(function() {
 					router.activate('orgs');

@@ -8,7 +8,7 @@ var database = function() {
 
 	var openDb = function(host, port, dbName) {
 		var server = new Server(host, port, {
-			auto_reconnect : true
+			auto_reconnect : true			
 		});
 
 		var def = q.defer();

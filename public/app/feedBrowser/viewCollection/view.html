@@ -1,0 +1,12 @@
+<h1 data-bind="html: name"></h1>
+
+<h3>Fields</h3>
+<ul data-bind="foreach: fields">
+	<li>
+		<a data-bind="attr: {href:'/#/feeds/' + $parent.feedId() + '/collections/' + $parent.collectionId() + '/fields/' + _id}"><span data-bind="html: name">Field</span></a>
+	</li>
+</ul>
+
+<button data-bind="click: addField">
+	New Field
+</button>

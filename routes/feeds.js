@@ -24,4 +24,12 @@ module.exports.init = function(app) {
 			});
 		});
 	});
+	
+	app.post('/feeds/:feedId/collections/:collectionId/fields', function(req, res) {
+		feedModule.addField(req.params["feedId"], req.params["collectionId"], req.body.name).then(function() {
+			res.json({
+				status : 'ok'
+			});
+		});
+	});
 };
