@@ -8,7 +8,7 @@ define(function(){
 		
 		return {
 			apiBaseUrl : url,
-			baswebsiteBaseUrleUrl: url 
+			websiteBaseUrl: url 
 			loginPage: "/#/login"
 		};
 	}();
