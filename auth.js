@@ -4,8 +4,8 @@ var passport = require('passport'), GoogleStrategy = require('passport-google').
 var config = require("./config");
 
 var googleAuthConfig = {
-	returnURL : config.baseUrl + '/login/return',
-	realm : config.baseUrl
+	returnURL : config.websiteBaseUrl + '/login/return',
+	realm : config.websiteBaseUrl
 };
 
 var strategy = new GoogleStrategy(googleAuthConfig, validateUser);
