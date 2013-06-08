@@ -4,9 +4,11 @@ var passport = require('passport'), GoogleStrategy = require('passport-google').
 var config = require("./config");
 
 var googleAuthConfig = {
-	returnURL : config.websiteBaseUrl + '/login/return',
-	realm : config.websiteBaseUrl
+	returnURL : config.baseUrl + '/login/return',
+	realm : config.baseUrl
 };
+
+console.log(googleAuthConfig);
 
 var strategy = new GoogleStrategy(googleAuthConfig, validateUser);
 
