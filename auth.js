@@ -8,15 +8,17 @@ var googleAuthConfig = {
 	realm : config.baseUrl
 };
 
-console.log(googleAuthConfig);
-
 var strategy = new GoogleStrategy(googleAuthConfig, validateUser);
 
 function validateUser(identifier, profile, done) {
 	var email = profile.emails[0].value;
 	getAccount(email, done).fail(function(err) {
 		if (err == "not found") {
+			console.log("### User not found. Creating... ");
+			console.log(profile);
 			accounts.create(email, profile.displayName, profile.name.givenName, profile.name.familyName).then(function(newAccount) {
+				console.log("### User created!");
+				console.log(newAccount);
 				done(null, newAccount);
 			});
 		}
@@ -34,15 +36,22 @@ passport.deserializeUser(function(email, done) {
 });
 
 function getAccount(email, done) {
+	console.log("Getting account by email " + email + "...");			
 	return accounts.getByEmail(email).then(function(account) {
+		console.log("Got account!");
+		console.log(account); //this works
 		done(null, account);
 	});
 };
 
 function restrict(req, res, next) {
+	console.log("Auth'd: " + req.isAuthenticated());
 	if (req.isAuthenticated() == true) {
 		next();
-	} else {		
+	} else {	
+		console.log("User is not authenticated.")
+		console.log(req.user);
+			
 		res.send('Authentication required to access that feature.', 401);
 	}
 }

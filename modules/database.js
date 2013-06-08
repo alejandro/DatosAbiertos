@@ -4,13 +4,13 @@ var q = require("q"), mongo = require('mongodb'), Server = mongo.Server, Db = mo
 
 var database = function() {
 
-	var server = new Server('localhost', 27017, {
-		auto_reconnect : true
-	});
-
 	var db;
 
-	var openDb = function(dbName) {
+	var openDb = function(host, port, dbName) {
+		var server = new Server(host, port, {
+			auto_reconnect : true
+		});
+
 		var def = q.defer();
 		db = new Db(dbName, server, {
 			safe : false
@@ -25,10 +25,10 @@ var database = function() {
 		return def.promise;
 	};
 
-	var newId = function(){
+	var newId = function() {
 		return BSON.ObjectID();
 	};
-	
+
 	var CollectionWithPromise = ( function() {
 
 			var coll = null;
@@ -70,7 +70,9 @@ var database = function() {
 				var def = q.defer();
 				coll.update({
 					_id : new BSON.ObjectID(id.toString())
-				}, {$set: modification}, {
+				}, {
+					$set : modification
+				}, {
 					upsert : false,
 					safe : true
 				}, function(err, recordsUpdate) {
@@ -186,13 +188,13 @@ var database = function() {
 		currentConnection : function() {
 			return currentConn;
 		},
-		connect : function(dbName) {
-			return openDb(dbName).then(function(db) {
+		connect : function(host, port, dbName) {
+			return openDb(host, port, dbName).then(function(db) {
 				isConn = true;
 				currentConn = db;
 			});
 		},
-		newId: newId,
+		newId : newId,
 		collection : function(collectionName) {
 			var def = q.defer();
 			db.collection(collectionName, function(err, coll) {
