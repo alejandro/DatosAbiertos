@@ -3,7 +3,7 @@
 <h3>Collections</h3>
 <ul data-bind="foreach: collections">
 	<li>
-		<a data-bind="attr: {href:'/#/collections/' + _id}"><span data-bind="html: name">Collection</span></a>
+		<a data-bind="attr: {href:'/#/feeds/' + $parent.feedId() + '/collections/' + _id}"><span data-bind="html: name">Collection</span></a>
 	</li>
 </ul>
 

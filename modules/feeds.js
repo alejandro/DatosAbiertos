@@ -3,6 +3,7 @@
 var database = require("../modules/database.js");
 var feeds = "feeds";
 var q = require("q");
+var _ = require('underscore');
 
 var mod = function() {
 
@@ -56,13 +57,13 @@ var mod = function() {
 	};
 
 	var addCollection = function(feedId, collectionName) {
-		
-		if(!collectionName || collectionName==null){
+
+		if (!collectionName || collectionName == null) {
 			var def = q.defer();
 			def.reject("Validation error! Must include name when creating a collection.");
 			return def.promise;
 		}
-		
+
 		return getCollection().then(function(col) {
 			return col.getById(feedId).then(function(feed) {
 				var collections = feed.collections || [];
@@ -78,6 +79,30 @@ var mod = function() {
 		});
 	};
 
+	var addField = function(feedId, collectionId, name) {
+		return getCollection().then(function(col) {
+			return col.getById(feedId).then(function(feed) {
+				var collections = _.map(feed.collections, function(c) {
+
+					if (c._id.toString() == collectionId.toString()) {
+				
+						var fields = c.fields || [];
+						fields.push({
+							_id : database.newId(),
+							name : name
+						});
+						c.fields = fields;
+					}
+					return c;
+				});
+				
+				return col.modify(feedId, {
+					collections : collections
+				});
+			});
+		});
+	};
+
 	return {
 		getAll : getAll,
 		getAllByOrgId : getAllByOrgId,
@@ -85,7 +110,8 @@ var mod = function() {
 		archive : archive,
 		create : create,
 		correctName : correctName,
-		addCollection : addCollection
+		addCollection : addCollection,
+		addField : addField
 	};
 }();
 

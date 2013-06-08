@@ -14,6 +14,11 @@ define(['server'], function(server) {
 					name : name
 				});
 			},
+			addField: function(name, feedId, collectionId){
+				return api.post("feeds/" + feedId + "/collections/" + collectionId + "/fields", {
+					name : name
+				});
+			}
 		};
 	}(server);
 

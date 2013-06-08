@@ -24,7 +24,12 @@ describe('Feeds', function() {
 	};
 	var feed3 = {
 		archived : true,
-		name : 'test3'
+		name : 'test3',
+		collections : [{
+			_id : database.newId(),
+			name : "test collection1",
+			fields : []
+		}]
 	};
 
 	beforeEach(function(done) {
@@ -35,7 +40,7 @@ describe('Feeds', function() {
 					feed1.orgId = org1._id.toString();
 					feed2.orgId = org2._id.toString();
 					feed3.orgId = org1._id.toString();
-					
+
 					database.collection("feeds").then(function(coll) {
 						coll.add(feed1).then(function() {
 							return coll.add(feed2);
@@ -53,7 +58,7 @@ describe('Feeds', function() {
 			database.currentConnection().collection(collectionName, function(err, coll) {
 				coll.remove({}, callback);
 			});
-		}		
+		}
 		deleteAll("orgs", deleteAll("feeds", done));
 	});
 
@@ -113,10 +118,10 @@ describe('Feeds', function() {
 			});
 		});
 	});
-	
+
 	describe("when adding a collection to a feed", function() {
 		it("should add the collection in the database", function(done) {
-			feedModule.addCollection(feed3._id, "collection name").then(function(modifiedFeed) {
+			feedModule.addCollection(feed2._id, "collection name").then(function(modifiedFeed) {
 				database.collection("feeds").then(function(col) {
 					col.getById(modifiedFeed._id).then(function(feedFromDatabase) {
 						feedFromDatabase.collections[0].name.should.equal("collection name");
@@ -126,13 +131,27 @@ describe('Feeds', function() {
 			});
 		});
 	});
-	
+
+	describe("when adding a field to a collection", function() {
+		it("should add the field in the database", function(done) {
+			//feed3 is the one with an existing collection
+			feedModule.addField(feed3._id, feed3.collections[0]._id, "field name").then(function(modifiedFeed) {
+				database.collection("feeds").then(function(col) {
+					col.getById(modifiedFeed._id).then(function(feedFromDatabase) {
+						feedFromDatabase.collections[0].fields[0].name.should.equal("field name");
+						feedFromDatabase.collections[0].fields[0]._id.should.not.be.null;
+					}).done(done);
+				});
+			});
+		});
+	});
+
 	describe("when adding a collection to a feed without a name", function() {
 		var nothing;
 		it("should throw an exception", function(done) {
-			feedModule.addCollection(feed3._id, nothing).fail(function(err){
-				err.should.equal("Validation error! Must include name when creating a collection.");				
-			}).done(done);			
+			feedModule.addCollection(feed3._id, nothing).fail(function(err) {
+				err.should.equal("Validation error! Must include name when creating a collection.");
+			}).done(done);
 		});
 	});
 })
