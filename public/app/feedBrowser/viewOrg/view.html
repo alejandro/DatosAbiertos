@@ -10,6 +10,19 @@
 <button data-bind="click: createFeed">
 	New Feed
 </button>
+
+<h3>Applications</h3>
+<ul data-bind="foreach: applications">
+	<li>
+		<a data-bind="attr: {href:'/#/applications/' + _id}"><span data-bind="html: name"></span></a>
+	</li>
+</ul>
+
+<button data-bind="click: addApplication">
+	New Application
+</button>
+
+
 <!-- 
 <button data-bind="click: archive">
 	Archive Org

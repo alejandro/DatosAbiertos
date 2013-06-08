@@ -62,6 +62,19 @@ describe('Orgs', function() {
 		});
 	});
 
+	describe("when adding an application to an org", function() {
+		it("should add the application in the database", function(done) {
+			orgModule.addApplication(org1._id, "application name").then(function(modifiedOrg) {
+				database.collection("orgs").then(function(col) {
+					col.getById(modifiedOrg._id).then(function(orgFromDatabase) {
+						orgFromDatabase.applications[0].name.should.equal("application name");
+						orgFromDatabase.applications[0]._id.should.not.be.null;
+					}).done(done);
+				});
+			});
+		});
+	});
+
 	describe('when getting all orgs for an account', function() {
 		it('should return the expected orgs where account is an admin', function(done) {
 			orgModule.create("org1", account1._id).done(function(newOrg1) {
