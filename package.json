@@ -11,6 +11,7 @@
     "express": "3.1.0",  
   	"q": "latest",  
   	"mocha": "latest",
-    "chai":"latest"  
+    "chai":"latest",
+    "jake": "latest"
   }
 }
