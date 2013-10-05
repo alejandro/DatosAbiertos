@@ -4,7 +4,8 @@
     </div>
     <div class="modal-body">
         <form data-bind="submit: create">
-        	Field name: <input data-bind="value: name"/>
+        	<p>Field name: <input data-bind="value: name"/></p>
+        	<p>Data type: <select data-bind="options: dataTypes, value: selectedDataType"/></p>
         </form>
     </div>
     <div class="modal-footer">

@@ -14,10 +14,23 @@ define(['server'], function(server) {
 					name : name
 				});
 			},
-			addField: function(name, feedId, collectionId){
+			addField : function(name, dataType, feedId, collectionId) {
 				return api.post("feeds/" + feedId + "/collections/" + collectionId + "/fields", {
-					name : name
+					name : name,
+					dataType : dataType
 				});
+			},
+			modifyField : function(name, dataType, feedId, collectionId, fieldId) {
+				return api.put("feeds/" + feedId + "/collections/" + collectionId + "/fields/" + fieldId, {
+					name : name,
+					dataType : dataType
+				});
+			},
+			getCollectionData : function(collectionId, page, itemsPerPage) {
+				return api.get("collections/" + collectionId + "/data");
+			},
+			addDataToCollection : function(collectionId, dataObj) {
+				return api.post("collections/" + collectionId + "/data", dataObj);
 			}
 		};
 	}(server);

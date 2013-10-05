@@ -2,6 +2,7 @@ var routes = function() {
 
 	var feeds = require("./feeds");
 	var orgs = require("./orgs");
+	var data = require("./data");
 	var login = require("./login");
 
 	return {
@@ -16,10 +17,14 @@ var routes = function() {
 			console.log("Initializing login routes...");
 			login.init(app);
 			
+			console.log("Initializing data routes...");
+			data.init(app);
+			
 		},
 		feeds : feeds,
 		orgs : orgs,
-		login : login
+		login : login,
+		data: data
 	}
 }();
 

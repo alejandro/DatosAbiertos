@@ -1,0 +1,26 @@
+<div>
+
+	<h1>Data for <span data-bind="html: collectionName"></span></h1>
+	<h3>from <span data-bind="html: feedName"></span></h3>
+
+	<table data-bind="visible: data().length>0">
+		<thead>
+			<tr data-bind="foreach: fields">
+				<th><span data-bind="html: name"></span></th>
+			</tr>
+		</thead>
+		<tbody data-bind="foreach: data">
+			<tr data-bind="foreachprop: $data">
+				<td><span data-bind="html: value"></span></td>
+			</tr>
+		</tbody>
+	</table>
+
+	<div data-bind="visible: data().length==0">
+		No data. You should add some!
+	</div>
+
+<button data-bind="click: addData">
+	Add Data
+</button>
+</div>

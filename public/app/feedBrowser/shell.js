@@ -29,6 +29,16 @@ define(['durandal/app','durandal/plugins/router', 'authChecker'],
 					name : 'View Collections'
 				},
 				{
+					url : 'feeds/:feedId/collections/:collectionId/data',
+					moduleId : 'feedBrowser/viewData/view',
+					name : 'Collection Data'
+				},				
+				{
+					url : 'feeds/:feedId/collections/:collectionId/fields/:fieldId',
+					moduleId : 'feedBrowser/modifyField/modify',
+					name : 'Modify Field'
+				},
+				{
 					url : 'login',
 					moduleId : 'feedBrowser/login/login',
 					name : 'Login',

@@ -135,14 +135,35 @@ describe('Feeds', function() {
 	describe("when adding a field to a collection", function() {
 		it("should add the field in the database", function(done) {
 			//feed3 is the one with an existing collection
-			feedModule.addField(feed3._id, feed3.collections[0]._id, "field name").then(function(modifiedFeed) {
+			feedModule.addField(feed3._id, feed3.collections[0]._id, "field name", "number").then(function(modifiedFeed) {
 				database.collection("feeds").then(function(col) {
 					col.getById(modifiedFeed._id).then(function(feedFromDatabase) {
 						feedFromDatabase.collections[0].fields[0].name.should.equal("field name");
+						feedFromDatabase.collections[0].fields[0].dataType.should.equal("number");
 						feedFromDatabase.collections[0].fields[0]._id.should.not.be.null;
 					}).done(done);
 				});
 			});
+		});
+	});
+
+	describe("when modifying a field", function() {
+		it("should change the field in the database", function(done) {
+			var feedId = feed1._id;
+			feedModule.addCollection(feedId, "modifying a field test").then(function(modifiedFeed) {
+				var collection = modifiedFeed.collections[0];
+				feedModule.addField(feedId, collection._id, "old field name").then(function(modifiedFeedWithField) {
+					var field = modifiedFeedWithField.collections[0].fields[0];
+
+					feedModule.modifyField(feedId, collection._id, field._id, "new name", "date").then(function(feedWithModifiedField) {
+						var modifiedField = feedWithModifiedField.collections[0].fields[0];
+
+						modifiedField.name.should.equal("new name");
+						modifiedField.dataType.should.equal("date");
+
+					}).done(done);
+				});
+			})
 		});
 	});
 

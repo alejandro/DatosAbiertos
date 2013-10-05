@@ -79,23 +79,53 @@ var mod = function() {
 		});
 	};
 
-	var addField = function(feedId, collectionId, name) {
+	var addField = function(feedId, collectionId, name, dataType) {		
 		return getCollection().then(function(col) {
 			return col.getById(feedId).then(function(feed) {
 				var collections = _.map(feed.collections, function(c) {
 
 					if (c._id.toString() == collectionId.toString()) {
-				
+
 						var fields = c.fields || [];
 						fields.push({
 							_id : database.newId(),
-							name : name
+							name : name,
+							dataType: dataType || "text"
 						});
 						c.fields = fields;
 					}
 					return c;
 				});
-				
+
+				return col.modify(feedId, {
+					collections : collections
+				});
+			});
+		});
+	};
+
+	var modifyField = function(feedId, collectionId, fieldId, name, dataType) {
+		return getCollection().then(function(col) {
+			return col.getById(feedId).then(function(feed) {
+
+				var collections = _.map(feed.collections, function(c) {
+
+					if (c._id.toString() == collectionId.toString()) {
+
+						c.fields = _.map(c.fields, function(f) {
+
+							if (f._id.toString() == fieldId.toString()) {
+
+								f.name = name;
+								f.dataType = dataType;
+							}
+
+							return f;
+						});
+					}
+					return c;
+				});
+
 				return col.modify(feedId, {
 					collections : collections
 				});
@@ -111,7 +141,8 @@ var mod = function() {
 		create : create,
 		correctName : correctName,
 		addCollection : addCollection,
-		addField : addField
+		addField : addField,
+		modifyField : modifyField
 	};
 }();
 
