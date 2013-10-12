@@ -8,7 +8,7 @@ var database = function() {
 
 	var openDb = function(host, port, dbName) {
 		var server = new Server(host, port, {
-			auto_reconnect : true			
+			auto_reconnect : true
 		});
 
 		var def = q.defer();
@@ -203,6 +203,16 @@ var database = function() {
 				} else {
 					def.resolve(new CollectionWithPromise(coll));
 				}
+			});
+			return def.promise;
+		},
+		drop : function(collectionName) {
+			var def = q.defer();
+			
+			db.collection(collectionName, function(err, collection) {
+				return collection.remove({}, function(err, removed) {
+					def.resolve(removed);
+				});
 			});
 			return def.promise;
 		},

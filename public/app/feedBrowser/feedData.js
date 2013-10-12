@@ -27,10 +27,10 @@ define(['server'], function(server) {
 				});
 			},
 			getCollectionData : function(collectionId, page, itemsPerPage) {
-				return api.get("collections/" + collectionId + "/data");
+				return api.get("collections/" + collectionId + "/documents");
 			},
-			addDataToCollection : function(collectionId, dataObj) {
-				return api.post("collections/" + collectionId + "/data", dataObj);
+			addDataToCollection : function(collectionId, doc) {
+				return api.post("collections/" + collectionId + "/documents", doc);
 			}
 		};
 	}(server);

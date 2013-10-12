@@ -8,7 +8,7 @@ define(['feedBrowser/orgData', 'durandal/app'], function(orgData, app) {
 		
 		var create = function(){
 			var newOrg = {name: name()};
-			orgData.create(newOrg).then(function(){
+			orgData.add(newOrg).then(function(){
 				closeModal(newOrg);
 			});
 		};

@@ -1,27 +1,39 @@
 "use strict";
 
 var database = require("../modules/database.js");
-var feeds = "feeds";
 var q = require("q");
 var _ = require('underscore');
 
 var mod = function() {
 
-	var getCollection = function(collectionId) {
-		return database.collection(collectionId.toString());
+	var getCollection = function() {
+		return database.collection("feeds");
 	};
 
-	var getAll = function(collectionId) {
-		return getCollection(collectionId).then(function(col) {
-			return col.getAll();
+	var getAll = function() {
+		return getCollection().then(function(col) {
+			return col.getAll({
+				archived : {
+					$ne : true
+				}
+			}).then(function(feeds) {
+				var collections = [];
+				_.each(feeds, function(f) {
+					var filteredCollections = _.filter(f.collections, function(c) {
+						return c.archived != true;
+					});
+					collections = filteredCollections.concat(collections);
+				});				
+				return collections;
+			});
 		});
 	};
 
-	var addData = function(collectionId, dataObject) {
-		return getCollection(collectionId).then(function(col) {
-			return col.add(dataObject);
-		});
-	};
+	// var addData = function(collectionId, dataObject) {
+	// return getCollection(collectionId).then(function(col) {
+	// return col.add(dataObject);
+	// });
+	// };
 
 	//
 	// var getAllByOrgId = function(orgId) {
@@ -38,14 +50,14 @@ var mod = function() {
 	// });
 	// };
 	//
-	// var archive = function(id) {
-	// return getCollection().then(function(col) {
-	// return col.modify(id, {
+
+	// var archiveDocument = function(collectionId, documentId) {
+	// return getCollection(collectionId).then(function(col) {
+	// return col.modify(documentId, {
 	// archived : true
 	// });
 	// });
 	// };
-	//
 
 	// var correctName = function(id, correctedName) {
 	// return getCollection().then(function(col) {
@@ -133,11 +145,11 @@ var mod = function() {
 	// };
 
 	return {
-		getAll : getAll,
-		addData : addData
+		getAll : getAll
+		// addData : addData,
+		// archiveDocument : archiveDocument
 		// getAllByOrgId : getAllByOrgId,
 		// get : getOne,
-		// archive : archive,
 		// create : create,
 		// correctName : correctName,
 		// addCollection : addCollection,

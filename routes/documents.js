@@ -1,17 +1,17 @@
 "use strict";
 
-var dataModule = require("../modules/collectionData");
+var dataModule = require("../modules/documents");
 var auth = require("../auth");
 
 module.exports.init = function(app) {
 
-	app.get('/collections/:collectionId/data', function(req, res) {
-		dataModule.getAll(req.params["collectionId"]).then(function(data) {
-			res.json(data);
+	app.get('/collections/:collectionId/documents', function(req, res) {
+		dataModule.getAll(req.params["collectionId"]).then(function(documents) {
+			res.json(documents);
 		});
 	});
 
-	app.post('/collections/:collectionId/data', function(req, res) {
+	app.post('/collections/:collectionId/documents', auth.restrict, function(req, res) {
 		dataModule.addData(req.params["collectionId"], req.body).then(function() {
 			res.json({
 				status : 'ok'
@@ -19,6 +19,14 @@ module.exports.init = function(app) {
 		});
 	});
 
+	app.delete ('/collections/:collectionId/documents/:documentId', auth.restrict,
+	function(req, res) {
+		dataModule.archiveDocument(req.params["collectionId"], req.params["documentId"]).then(function() {
+			res.json({
+				status : 'ok'
+			});
+		})
+	});
 	//
 	// app.get('/feeds/:id', auth.restrict, function(req, res) {
 	// feedModule.get(req.params["id"]).then(function(feed) {

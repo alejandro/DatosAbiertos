@@ -7,7 +7,7 @@ define(function() {
 				
 			},
 			viewAttached: function(x){
-				console.log(x);
+			
 			}
 		};
 	}();

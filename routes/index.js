@@ -2,7 +2,8 @@ var routes = function() {
 
 	var feeds = require("./feeds");
 	var orgs = require("./orgs");
-	var data = require("./data");
+	var documents = require("./documents");
+	var collections = require("./collections");
 	var login = require("./login");
 
 	return {
@@ -17,14 +18,17 @@ var routes = function() {
 			console.log("Initializing login routes...");
 			login.init(app);
 			
-			console.log("Initializing data routes...");
-			data.init(app);
+			console.log("Initializing document routes...");
+			documents.init(app);
+			
+			console.log("Initializing collection routes...");
+			collections.init(app);
 			
 		},
 		feeds : feeds,
 		orgs : orgs,
 		login : login,
-		data: data
+		documents: documents
 	}
 }();
 
