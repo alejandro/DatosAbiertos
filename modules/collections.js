@@ -26,6 +26,7 @@ var mod = function() {
 						return {
 							_id: c._id,
 							name: c.name,
+							orgId: f.orgId
 						};
 					});
 					collections = collections.concat(mappedCollections);
