@@ -25,9 +25,11 @@ database.connect(dbHost, dbPort, dbName).then(function() {
 		console.log("Setting up mongoDB session mgt...");
 		app.use(express.session({
 			secret: "cafe el gringo",
+			cookie : {
+				maxAge: 300000
+			},
 			store: new mongoConnect({
-				url: 'mongodb://' + dbHost + ':' + dbPort + '/' + dbName, 
-              	maxAge: 300000
+				url: 'mongodb://' + dbHost + ':' + dbPort + '/' + dbName
 			})
 		}));
 		app.use(auth.passport.initialize());
