@@ -9,6 +9,7 @@ var q = require("q");
 describe('Collections', function() {
 
 	var feed1 = {
+		orgId: "orgId",
 		name : 'test1',
 		collections : [{
 			_id : database.newId(),
@@ -16,6 +17,7 @@ describe('Collections', function() {
 		}]
 	};
 	var feed2 = {
+		orgId: "orgId",
 		name : 'test2',
 		collections : [{
 			_id : database.newId(),
@@ -26,6 +28,7 @@ describe('Collections', function() {
 		}]
 	};
 	var feed3 = {
+		orgId: "orgId",
 		name : 'test3',
 		collections : [{
 			_id : database.newId(),
@@ -44,6 +47,7 @@ describe('Collections', function() {
 	};
 
 	var feed4 = {
+		orgId: "orgId",
 		name : 'test4',
 		archived : true,
 		collections : [{
@@ -84,6 +88,7 @@ describe('Collections', function() {
 			collectionModule.getAll().then(function(collections) {
 				collections.length.should.equal(5);
 				expect(collections[0].fields).to.be.undefined
+				collections[0].orgId.should.equal("orgId");
 			}).done(done);
 		})
 	});
