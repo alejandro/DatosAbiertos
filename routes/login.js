@@ -9,7 +9,6 @@ module.exports.init = function(app) {
 	});
 
 	app.get('/login/check', auth.restrict, function(req, res){
-		res.render("ok");
 		res.end();
 	});
 	
