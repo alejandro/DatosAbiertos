@@ -49,9 +49,7 @@ function restrict(req, res, next) {
 	if (req.isAuthenticated() == true) {
 		next();
 	} else {	
-		console.log("User is not authenticated.")
-		console.log(req.user);
-			
+		console.log("User is not authenticated.")		
 		res.send('Authentication required to access that feature.', 401);
 	}
 }

@@ -19,7 +19,7 @@ define(['server'], function(server) {
 			authFailed : function() {
 				authenticated = false;
 				var def = $.Deferred();
-				def.resolve();
+				def.resolve(authenticated);
 				return def.promise();
 			}
 		};

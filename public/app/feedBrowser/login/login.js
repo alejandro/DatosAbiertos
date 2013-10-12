@@ -2,7 +2,14 @@ define(function() {
 
 	var viewModel = function() {
 		
-		return {};
+		return {
+			activate: function(){
+				
+			},
+			viewAttached: function(x){
+				console.log(x);
+			}
+		};
 	}();
 
 	return viewModel;

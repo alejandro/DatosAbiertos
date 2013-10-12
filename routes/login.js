@@ -4,6 +4,7 @@ module.exports.init = function(app) {
 	app.get('/login/google', auth.authenticateWithGoogle);
 	
 	app.get('/login/return', auth.authenticateWithGoogle, function(req, res) {
+		console.log("Redirecting to '/#/'...");		
 		res.redirect('/#/');
 	});
 
