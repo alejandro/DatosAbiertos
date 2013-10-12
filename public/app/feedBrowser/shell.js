@@ -37,7 +37,20 @@ define(['durandal/app', 'durandal/plugins/router', 'authChecker'], function(app,
 					visible : true
 				}]);
 
-				return router.activate('orgs');				
+				var authenticationDef = $.Deferred();
+
+				authChecker.check().then(function () {
+					authenticationDef.resolve(true);
+				}).fail(function () {
+					authenticationDef.resolve(false);
+				})
+
+				return authenticationDef.promise().then(function (authenticated) {
+					if (authenticated) {
+						return router.activate('orgs');
+					}
+					return router.activate('login');
+				}); 
 			});
 		}
 	};
