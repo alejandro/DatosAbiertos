@@ -76,13 +76,13 @@ describe('Documents', function() {
 				})
 			}).done(function() {
 
-				collectionDataModule.getAll(collection._id).then(function(data) {
-					data.length.should.equal(1);
-					data[0].name.should.equal("test");
-					data[0].color.should.equal("red");
-					data[0].cost.should.equal(5);
-					data[0].paidOn.toString().should.equal(now.toString());
-					data[0]._id.should.not.be.null;
+				collectionDataModule.getAll(collection._id).then(function(documents) {
+					documents.length.should.equal(1);
+					documents[0].name.should.equal("test");
+					documents[0].color.should.equal("red");
+					documents[0].cost.should.equal(5);
+					documents[0].paidOn.toString().should.equal(now.toString());
+					documents[0]._id.should.not.be.null;
 
 				}).done(done);
 			});
