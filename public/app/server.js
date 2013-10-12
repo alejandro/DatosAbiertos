@@ -35,16 +35,7 @@ define(['config', 'durandal/plugins/router'],function(config, router){
                 type: type,
                 data: data
             });
-
-			promise.fail(function(err){
-				if(err.status == 401){
-					console.log("Got a 401... redirecting to the login page.");
-					require('authChecker').authFailed().done(function(){
-						router.navigateToRoute(config.loginPage);	
-					});					
-				}	
-			});
-			
+            
             //error handling
             promise.then(function (response, textStatus, jqXhr) {
                 if (response && response.Status == "error") {
