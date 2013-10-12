@@ -10,53 +10,51 @@ describe('Collections', function() {
 
 	var feed1 = {
 		name : 'test1',
-		collections: [{
+		collections : [{
 			_id : database.newId(),
-			name : "test collection6"			
+			name : "test collection6"
 		}]
 	};
 	var feed2 = {
 		name : 'test2',
-		collections: [{
+		collections : [{
 			_id : database.newId(),
-			name : "test collection4"			
-		},
-		{
+			name : "test collection4"
+		}, {
 			_id : database.newId(),
-			name : "test collection5"			
+			name : "test collection5"
 		}]
 	};
 	var feed3 = {
 		name : 'test3',
 		collections : [{
 			_id : database.newId(),
-			name : "test collection1"			
-		},
-		{
+			name : "test collection1",
+			fields : [{
+				name : "one"
+			}]
+		}, {
 			_id : database.newId(),
-			name : "test collection2",	
-			archived: true		
-		},
-		{
+			name : "test collection2",
+			archived : true
+		}, {
 			_id : database.newId(),
-			name : "test collection3"			
+			name : "test collection3"
 		}]
 	};
 
-var feed4 = {
+	var feed4 = {
 		name : 'test4',
-		archived: true,
+		archived : true,
 		collections : [{
 			_id : database.newId(),
-			name : "archived collection1"			
-		},
-		{
+			name : "archived collection1"
+		}, {
 			_id : database.newId(),
-			name : "archived collection2"				
-		},
-		{
+			name : "archived collection2"
+		}, {
 			_id : database.newId(),
-			name : "archived collection3"			
+			name : "archived collection3"
 		}]
 	};
 
@@ -66,7 +64,7 @@ var feed4 = {
 				return coll.add(feed2);
 			}).then(function() {
 				return coll.add(feed3);
-			}).fail(function(err){
+			}).fail(function(err) {
 				console.log(err);
 			});
 		}).then(done);
@@ -85,8 +83,8 @@ var feed4 = {
 		it('should return a list of collections', function(done) {
 			collectionModule.getAll().then(function(collections) {
 				collections.length.should.equal(5);
-				expect(collections[0].fields).to.be.undefined;
+				expect(collections[0].fields).to.be.undefined
 			}).done(done);
 		})
-	});	
+	});
 })

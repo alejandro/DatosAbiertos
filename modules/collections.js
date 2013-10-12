@@ -22,7 +22,13 @@ var mod = function() {
 					var filteredCollections = _.filter(f.collections, function(c) {
 						return c.archived != true;
 					});
-					collections = filteredCollections.concat(collections);
+					var mappedCollections = _.map(filteredCollections, function(c){
+						return {
+							_id: c._id,
+							name: c.name,
+						};
+					});
+					collections = collections.concat(mappedCollections);
 				});				
 				return collections;
 			});
