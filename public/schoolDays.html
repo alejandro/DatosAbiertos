@@ -1,0 +1,84 @@
+<html>
+	<head>
+		<title>ASJ: School Days</title>
+	</head>
+	<body>
+		<h1>ASJ: School Days</h1>
+
+		<p>
+			This single page app will present a form and will post the contents to the Datos Abiertos repository. Then it will display a thank you message.
+		</p>
+
+		<table id='form'>
+			<tr>
+				<th>Date</th>
+				<td><span id='today'></span></td>
+			</tr>
+			<tr>
+				<th>School</th>
+				<td>
+				<select id='schools'/>
+				</td>
+			</tr>
+			<tr>
+				<th>Open</th>
+				<td><label for='open_yes'>Yes</label>
+				<input type='radio' name='open' id='open_yes' value="yes" />
+				<label for='open_no'>No</label>
+				<input type='radio' name='open' id='open_no' value="no" />
+				</td>
+			</tr>
+			<tr>
+				<th></th>
+				<td>
+				<button id='send'>
+					Send
+				</button></td>
+			</tr>
+		</table>
+
+		<div id='thanks' style='display: none;'>
+			<h3>Thank you!</h3>
+			<p>
+				The data has been submitted to the server.
+			</p>
+		</div>
+
+		<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+		<script type='text/javascript'>
+			$(document).ready(function() {
+				var apiBaseUrl = "http://localhost:3000/";
+				var schoolsCollectionId = "525975a7d709f67801000003";
+
+				var date = new Date();
+
+				$("#today").html(date);
+
+				//Populate schools drop-down
+				$.get(apiBaseUrl + 'collections/' + schoolsCollectionId + '/documents').then(function(schools) {
+					var schoolOptions = $("#schools");
+					$.each(schools, function() {
+						schoolOptions.append($("<option />").val(this._id).text(this.Name));
+					});
+				});
+
+				$("#send").click(function() {
+
+					var objToSend = {
+						schoolId : $("#schools").val(),
+						date : date,
+						open : $("input:radio[name='open']:checked").val()
+					};
+
+					//now to post this to the repo
+					var schoolDays = "5259762dd709f6780100000b";
+					$.post(apiBaseUrl + 'collections/' + schoolDays + '/documents').then(function() {
+						$("#form").hide();
+						$("#thanks").show();
+					});
+
+				});
+			});
+		</script>
+	</body>
+</html>
