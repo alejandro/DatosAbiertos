@@ -1,6 +1,10 @@
-"use strict";
+'use strict';
 
-var q = require("q"), mongo = require('mongodb'), Server = mongo.Server, Db = mongo.Db, BSON = mongo.BSONPure;
+var q      = require('q');
+var mongo  = require('mongodb');
+var Server = mongo.Server;
+var Db     = mongo.Db;
+var BSON   = mongo.BSONPure;
 
 var database = function() {
 
@@ -35,7 +39,7 @@ var database = function() {
 
 			function CollectionWithPromise(collection) {
 				coll = collection;
-			};
+			}
 
 			var getById = function(id) {
 				var def = q.defer();
@@ -44,7 +48,9 @@ var database = function() {
 
 					bsonId = new BSON.ObjectID(id.toString());
 				} catch(err) {
-					def.reject("There was a problem with the provided Id '" + id + "'. Cannot be converted to BSON Id.");
+					var msg = 'There was a problem with the provided Id "' + id + '". '
+							msg += 'Cannot be converted to BSON Id.'
+					def.reject(msg);
 				}
 				if (bsonId) {
 					coll.findOne({
@@ -52,8 +58,8 @@ var database = function() {
 					}, function(err, doc) {
 						if (err) {
 							def.reject(err);
-						} else if (doc == null) {
-							def.reject("Could not find the record with id " + id + ".");
+						} else if (!doc) {
+							def.reject('Could not find the record with id "' + id + '".');
 						} else {
 							def.resolve(doc);
 						}
@@ -133,7 +139,7 @@ var database = function() {
 
 			CollectionWithPromise.prototype.getAll = function(query) {
 				var def = q.defer();
-				var query = query || {};
+				query = query || {};
 				coll.find(query, function(err, cursor) {
 					if (err) {
 						def.reject(err);
@@ -152,7 +158,7 @@ var database = function() {
 
 			CollectionWithPromise.prototype.getFirst = function(query) {
 				var def = q.defer();
-				var query = query || {};
+				query = query || {};
 				coll.find(query, function(err, cursor) {
 					if (err) {
 						def.reject(err);
@@ -164,7 +170,7 @@ var database = function() {
 								if (items.length > 0) {
 									def.resolve(items[0]);
 								} else {
-									def.reject("not found");
+									def.reject('not found');
 								}
 							}
 						});

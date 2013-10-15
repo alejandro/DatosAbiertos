@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
-var database = require("../modules/database.js");
-var accounts = require("../modules/accounts.js");
-var collectionName = "orgs";
-var q = require("q");
+var q              = require('q');
+var database       = require('../modules/database.js');
+var accounts       = require('../modules/accounts.js');
+var collectionName = 'orgs';
 
 var mod = function() {
 
@@ -36,7 +36,7 @@ var mod = function() {
 	var getAllForAccount = function(accountId) {
 		return getCollection().then(function(coll){
 			return coll.getAll({
-				admins : accountId.toString() 
+				admins : accountId.toString()
 			});
 		});
 	};

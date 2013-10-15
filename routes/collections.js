@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
-var mod = require("../modules/collections");
-var auth = require("../auth");
+var mod  = require('../modules/collections');
+var auth = require('../auth');
 
 module.exports.init = function(app) {
 

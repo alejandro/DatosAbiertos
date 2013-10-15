@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
-var database = require("../modules/database.js");
-var feeds = "feeds";
-var q = require("q");
-var _ = require('underscore');
+var database = require('../modules/database.js');
+var q        = require('q');
+var _        = require('underscore');
+var feeds    = 'feeds';
 
 var mod = function() {
 
@@ -58,9 +58,9 @@ var mod = function() {
 
 	var addCollection = function(feedId, collectionName) {
 
-		if (!collectionName || collectionName == null) {
+		if (!collectionName) {
 			var def = q.defer();
-			def.reject("Validation error! Must include name when creating a collection.");
+			def.reject('Validation error! Must include name when creating a collection.');
 			return def.promise;
 		}
 
@@ -79,7 +79,7 @@ var mod = function() {
 		});
 	};
 
-	var addField = function(feedId, collectionId, name, dataType) {		
+	var addField = function(feedId, collectionId, name, dataType) {
 		return getCollection().then(function(col) {
 			return col.getById(feedId).then(function(feed) {
 				var collections = _.map(feed.collections, function(c) {
@@ -90,7 +90,7 @@ var mod = function() {
 						fields.push({
 							_id : database.newId(),
 							name : name,
-							dataType: dataType || "text"
+							dataType: dataType || 'text'
 						});
 						c.fields = fields;
 					}

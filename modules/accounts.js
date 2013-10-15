@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
-var database = require("../modules/database.js");
-var collectionName = "accounts";
+var database = require('../modules/database.js');
+var collectionName = 'accounts';
 
 var mod = function() {
 

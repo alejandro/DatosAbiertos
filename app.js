@@ -1,46 +1,44 @@
-"use strict";
+'use strict';
 
-var mongo = require('mongodb');
-var express = require('express');
-var app = new express();
-var database = require("./modules/database.js");
-var auth = require('./auth');
-var routes = require("./routes");
+var express      = require('express');
 var mongoConnect = require('connect-mongodb');
 
-console.log("Starting app...");
+var app          = express();
+var database     = require('./modules/database.js');
+var auth         = require('./auth');
+var routes       = require('./routes');
+var cfg          = require('./config')[app.get('env')];
 
-var dbHost = 'localhost';
-var dbPort = 27017;
-var dbName = "DatosAbiertos";
+console.log('Starting app...');
 
-database.connect(dbHost, dbPort, dbName).then(function() {
-	console.log("Database connected.");
+
+database.connect(cfg.db.host, cfg.db.port, cfg.db.name).then(function() {
+	console.log('Database connected.');
 	app.configure(function() {
 		app.use(express.static(__dirname + '/public'));
 		app.use(express.logger('dev'));
 		app.use(express.bodyParser());
-		app.set('port', process.env.PORT || 3000);
+		app.set('port', cfg.port);
 		app.use(express.cookieParser());
-		console.log("Setting up mongoDB session mgt...");
+		console.log('Setting up mongoDB session mgt...');
 		app.use(express.session({
-			secret: "cafe el gringo",
+			secret: 'cafe el gringo',
 			cookie : {
 				maxAge: 300000
 			},
 			store: new mongoConnect({
-				url: 'mongodb://' + dbHost + ':' + dbPort + '/' + dbName
+				url: 'mongodb://' + cfg.db.host + ':' + cfg.db.port + '/' + cfg.db.name
 			})
 		}));
 		app.use(auth.passport.initialize());
 		app.use(auth.passport.session());
 	});
-	console.log("App configured.");
+	console.log('App configured.');
 
 	routes.init(app);
-	console.log("Routes initialized.");
+	console.log('Routes initialized.');
 
 	app.listen(app.get('port'), function() {
-		console.log("DatosAbiertos API Server listening on port " + app.get('port'));
+		console.log('DatosAbiertos API Server listening on port %d', this.address().port);
 	});
 });

@@ -1,9 +1,6 @@
-"use strict";
+'use strict';
 
-var database = require("../modules/database.js");
-var feeds = "feeds";
-var q = require("q");
-var _ = require('underscore');
+var database = require('../modules/database.js');
 
 var mod = function() {
 
