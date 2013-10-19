@@ -110,28 +110,31 @@ var mod = function() {
 	var getApplicationUser = function(appId, username, password) {
 		return getCollection().then(function(col) {
 			var bsonAppId = database.getId(appId.toString());
-			var org = col.getFirst({
+			col.getFirst({
 				applications : {
 					$elemMatch : {
 						_id : bsonAppId
 					}
 				}
+			}).then(function(org){
+				if (Object.keys(org).length==0){
+					throw new Error("Org", "Application user was not found for given credentials.")
+				}				
+				var app = _.find(org.applications, function(a) {
+					return a._id.toString() == appId.toString()
+				});
+				if (!app){
+					throw new Error("Token", "Application user was not found for given credentials.")
+				}				
+				var user = _.find(app.users, function(u) {
+					return u.username == username && u.password == password
+				});
+				if(!user)
+					throw new Error("User", "Application user was not found for given credentials.")
+				return user;
+					
 			});
-			if (!org || Object.keys(org).length==0){
-				throw new Error("Org", "Application user was not found for given credentials.")
-			}				
-			var app = _.find(org.applications, function(a) {
-				return a._id.toString() == appId.toString()
-			});
-			if (!app){
-				throw new Error("Token", "Application user was not found for given credentials.")
-			}				
-			var user = _.find(app.users, function(u) {
-				return u.username == username && u.password == password
-			});
-			if(!user)
-				throw new Error("User", "Application user was not found for given credentials.")
-			return user;
+			
 		});
 	};
 

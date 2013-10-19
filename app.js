@@ -19,15 +19,9 @@ database.connect(cfg.db.host, cfg.db.port, cfg.db.name).then(function() {
 		app.use(express.bodyParser());
 		app.set('port', cfg.port);
 		app.use(express.cookieParser());
-		console.log('Setting up mongoDB session mgt...');
-		app.use(express.session({
-			secret: 'cafe el gringo',
-			cookie : {
-				maxAge: 300000
-			},
-			store: new mongoConnect({
-				url: 'mongodb://' + cfg.db.host + ':' + cfg.db.port + '/' + cfg.db.name
-			})
+		console.log('Setting up session mgt...');
+		app.use(express.cookieSession({
+			secret: 'cafe el gringo'
 		}));
 		app.use(auth.passport.initialize());
 		app.use(auth.passport.session());

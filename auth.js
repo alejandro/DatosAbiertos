@@ -1,10 +1,12 @@
 'use strict';
 
-var passport = require('passport');
+var passport       = require('passport');
 var GoogleStrategy = require('passport-google').Strategy;
-var accounts = require('./modules/accounts');
-var config = require('./config');
-var orgs = require('./modules/orgs');
+var accounts       = require('./modules/accounts');
+var express        = require('express');
+var app            = express();
+var config         = require('./config')[app.get('env')];
+var orgs           = require('./modules/orgs');
 var googleAuthConfig = {
 	returnURL : config.baseUrl + '/login/return',
 	realm : config.baseUrl
@@ -41,27 +43,18 @@ function getAccount(email, done) {
 	console.log('Getting account by email %s...', email);
 	return accounts.getByEmail(email).then(function(account) {
 		console.log('Got account!');
-		console.log(account);
-		//this works
+		console.log(account); //this works
 		done(null, account);
 	});
 }
 
 function restrict(req, res, next) {
-
-	var unauthorized = function() {
-		console.log('User is not authenticated.')
-		res.send('Authentication required to access that feature.', 401);
-	};
-
+	console.log('Auth\'d: ' + req.isAuthenticated());
 	if (req.isAuthenticated()) {
 		next();
 	} else {
-		//possibly logging in via application token and applicatin user creds
-		if (req.body.token && req.body.username && req.body.password && orgs.isValidAppUser(req.body.token, req.body.username, req.body.password)) {
-			next();
-		} else
-			unauthorized();
+		console.log('User is not authenticated.')
+		res.send('Authentication required to access that feature.', 401);
 	}
 }
 
