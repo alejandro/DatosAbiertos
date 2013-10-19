@@ -3,7 +3,9 @@
 var passport       = require('passport');
 var GoogleStrategy = require('passport-google').Strategy;
 var accounts       = require('./modules/accounts');
-var config         = require('./config');
+var express        = require('express');
+var app            = express();
+var config         = require('./config')[app.get('env')];
 var googleAuthConfig = {
 	returnURL : config.baseUrl + '/login/return',
 	realm : config.baseUrl
