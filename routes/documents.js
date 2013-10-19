@@ -16,6 +16,8 @@ module.exports.init = function(app) {
 			res.json({
 				status : 'ok'
 			});
+		}).fail(function(err){
+			res.json({error: err}, 405);
 		});
 	});
 

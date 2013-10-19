@@ -15,6 +15,16 @@ define(['durandal/app', 'durandal/plugins/router', 'authChecker'], function(app,
 					name : 'View Organization',
 					visible : true
 				}, {
+					url : '/orgs/:orgId/applications/:appId',
+					moduleId : 'feedBrowser/viewApplication/view',
+					name : 'View Application',
+					visible : true
+				}, {
+					url : '/orgs/:orgId/applications/:appId/users/:userId',
+					moduleId : 'feedBrowser/modifyUser/modify',
+					name : 'Modify User',
+					visible : true
+				}, {
 					url : 'feeds/:feedId',
 					moduleId : 'feedBrowser/viewFeed/feed',
 					name : 'View Feeds'

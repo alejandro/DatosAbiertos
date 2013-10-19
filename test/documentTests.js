@@ -56,6 +56,15 @@ describe('Documents', function() {
 		});
 	});
 
+	describe('when attempting to add empty data to a collection', function() {
+		it('should raise the expected error', function(done) {
+			collectionDataModule.addData(collection._id, {})
+			.fail(function(err) {
+				err.should.equal('Cannot add an empty item.');
+			}).done(done);
+		});
+	});
+
 	describe('when getting data for a collection', function() {
 		it('should return the expected data', function(done) {
 

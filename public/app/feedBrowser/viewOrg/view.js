@@ -32,6 +32,7 @@ define(['feedBrowser/orgData', 'durandal/app'], function(orgData, app) {
 			
 		return {
 			name : name,
+			orgId: orgId,
 			feeds : feeds,
 			createFeed : function() {
 				app.showModal('feedBrowser/createFeed/create').then(function(newFeed) {

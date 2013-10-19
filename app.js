@@ -11,7 +11,6 @@ var cfg          = require('./config')[app.get('env')];
 
 console.log('Starting app...');
 
-
 database.connect(cfg.db.host, cfg.db.port, cfg.db.name).then(function() {
 	console.log('Database connected.');
 	app.configure(function() {

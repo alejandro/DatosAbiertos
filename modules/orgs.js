@@ -1,8 +1,9 @@
 'use strict';
 
-var q              = require('q');
-var database       = require('../modules/database.js');
-var accounts       = require('../modules/accounts.js');
+var q = require('q');
+var _ = require('underscore');
+var database = require('../modules/database.js');
+var accounts = require('../modules/accounts.js');
 var collectionName = 'orgs';
 
 var mod = function() {
@@ -34,14 +35,14 @@ var mod = function() {
 	};
 
 	var getAllForAccount = function(accountId) {
-		return getCollection().then(function(coll){
+		return getCollection().then(function(coll) {
 			return coll.getAll({
 				admins : accountId.toString()
 			});
 		});
 	};
-	
-	var addApplication = function(orgId, applicationsName){
+
+	var addApplication = function(orgId, applicationsName) {
 		return getCollection().then(function(col) {
 			return col.getById(orgId).then(function(org) {
 				var applications = org.applications || [];
@@ -56,12 +57,92 @@ var mod = function() {
 			});
 		});
 	};
-	
+
+	var addApplicationUser = function(orgId, appId, newUser) {
+		return getCollection().then(function(col) {
+			return col.getById(orgId).then(function(org) {
+				var applications = org.applications || [];
+				_.each(org.applications, function(a) {
+					if (a._id.toString() == appId.toString()) {
+						if (!a.users) {
+							a.users = [];
+						}
+						a.users.push({
+							_id : database.newId(),
+							name : newUser.name,
+							username : newUser.username,
+							password : newUser.password,
+							email : newUser.email
+						});
+					}
+				});
+
+				return col.modify(orgId, {
+					applications : applications
+				});
+			});
+		});
+	};
+
+	var modifyApplicationUser = function(orgId, appId, userId, mods) {
+		return getCollection().then(function(col) {
+			return col.getById(orgId).then(function(org) {
+				var applications = _.map(org.applications || [], function(a) {
+					if (a._id.toString() == appId.toString()) {
+						a.users = _.map(a.users, function(u) {
+							if (u._id.toString() == userId.toString()) {
+								u.name = mods.name;
+								u.username = mods.username;
+								u.email = mods.email;
+							}
+							return u;
+						});
+					}
+					return a;
+				});
+				return col.modify(orgId, {
+					applications : applications
+				});
+			});
+		});
+	};
+
+	var getApplicationUser = function(appId, username, password) {
+		return getCollection().then(function(col) {
+			var bsonAppId = database.getId(appId.toString());
+			var org = col.getFirst({
+				applications : {
+					$elemMatch : {
+						_id : bsonAppId
+					}
+				}
+			});
+			if (!org || Object.keys(org).length==0){
+				throw new Error("Org", "Application user was not found for given credentials.")
+			}				
+			var app = _.find(org.applications, function(a) {
+				return a._id.toString() == appId.toString()
+			});
+			if (!app){
+				throw new Error("Token", "Application user was not found for given credentials.")
+			}				
+			var user = _.find(app.users, function(u) {
+				return u.username == username && u.password == password
+			});
+			if(!user)
+				throw new Error("User", "Application user was not found for given credentials.")
+			return user;
+		});
+	};
+
 	return {
 		getById : getById,
 		create : create,
 		getAllForAccount : getAllForAccount,
-		addApplication: addApplication
+		addApplication : addApplication,
+		addApplicationUser : addApplicationUser,
+		modifyApplicationUser : modifyApplicationUser,
+		getApplicationUser : getApplicationUser
 	};
 }();
 

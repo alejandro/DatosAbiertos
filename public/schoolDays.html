@@ -63,16 +63,19 @@
 				});
 
 				$("#send").click(function() {
-
+				
+					var shortDate = (date.getMonth() + 1) + '/' + date.getDate() + '/' +  date.getFullYear();
 					var objToSend = {
-						schoolId : $("#schools").val(),
-						date : date,
-						open : $("input:radio[name='open']:checked").val()
+						'School Id' : $("#schools").val(),
+						'Date' : shortDate,
+						'Open' : $("input:radio[name='open']:checked").val()
 					};
 
 					//now to post this to the repo
 					var schoolDays = "5259762dd709f6780100000b";
-					$.post(apiBaseUrl + 'collections/' + schoolDays + '/documents').then(function() {
+					var token = "5262a1ca689515c720000004";
+					objToSend = $.extend(objectToSend, {token: token, username: 'test', password: 'testpass123'});
+					$.post(apiBaseUrl + 'collections/' + schoolDays + '/documents', objToSend).then(function() {
 						$("#form").hide();
 						$("#thanks").show();
 					});

@@ -52,4 +52,20 @@ module.exports.init = function(app) {
 			});
 		});
 	});
+	
+	app.post('/orgs/:orgId/applications/:appId/users', function(req, res) {
+		orgModule.addApplicationUser(req.params.orgId, req.params.appId, req.body).then(function() {
+			res.json({
+				status : 'ok'
+			});
+		});
+	});
+	
+	app.put('/orgs/:orgId/applications/:appId/users/:userId', function(req, res) {
+		orgModule.modifyApplicationUser(req.params.orgId, req.params.appId, req.params.userId, req.body).then(function() {
+			res.json({
+				status : 'ok'
+			});
+		});
+	});
 };

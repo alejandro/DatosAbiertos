@@ -1,0 +1,19 @@
+<div class="messageBox">
+    <div class="modal-header">
+        <h3>Create a New Application User</h3>
+    </div>
+    <div class="modal-body">
+        <form data-bind="submit: create">
+        	<p>Name: <input data-bind="value: name"/></p>
+        	<p>Email: <input data-bind="value: email"/></p>
+        	<p>Username: <input data-bind="value: username"/></p>
+        	<p>Password: <input data-bind="value: password"/></p>
+        	<p>Password (again): <input data-bind="value: passwordConfirm"/></p>
+        	<p data-bind='if: password()!=passwordConfirm()'>Passwords must match.</p>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" data-bind="click: create, disabled: password()!=passwordConfirm()">Create</button>
+    </div>
+</div>
+

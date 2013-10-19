@@ -14,7 +14,7 @@
 <h3>Applications</h3>
 <ul data-bind="foreach: applications">
 	<li>
-		<a data-bind="attr: {href:'/#/applications/' + _id}"><span data-bind="html: name"></span></a>
+		<a data-bind="attr: {href:'/#/orgs/' + $parent.orgId() + '/applications/' + _id}"><span data-bind="html: name"></span></a>
 	</li>
 </ul>
 

@@ -8,13 +8,37 @@ var q = require("q");
 describe('Orgs', function() {
 
 	var org1 = {
-		name : "Police"
+		name : "Police",
+		applications : [{
+			name : 'Web App',
+			_id : database.newId(),
+			users : [{
+				_id : database.newId(),
+				username : 'testUsername1',
+				password : 'testPassword1'
+			}]
+		}]
 	};
 	var org2 = {
-		name : "Firemen"
+		name : "Firemen",
+		applications : [{
+			name : 'Android App',
+			_id : database.newId(),
+			users : [{
+				_id : database.newId(),
+				name : 'testName1',
+				username : 'testUsername1',
+				email : 'testEmail1',
+				password : 'testPassword1'
+			}]
+		}]
 	};
 	var org3 = {
-		name : "Healthcare"
+		name : "Healthcare",
+		applications : [{
+			name : 'iPhone App',
+			_id : database.newId(),
+		}]
 	};
 
 	var account1 = {
@@ -67,11 +91,68 @@ describe('Orgs', function() {
 			orgModule.addApplication(org1._id, "application name").then(function(modifiedOrg) {
 				database.collection("orgs").then(function(col) {
 					col.getById(modifiedOrg._id).then(function(orgFromDatabase) {
-						orgFromDatabase.applications[0].name.should.equal("application name");
-						orgFromDatabase.applications[0]._id.should.not.be.null;
+						orgFromDatabase.applications[1].name.should.equal("application name");
+						orgFromDatabase.applications[1]._id.should.not.be.null;
 					}).done(done);
 				});
 			});
+		});
+	});
+
+	describe("when adding an application user to an application", function() {
+		it("should add the user in the database", function(done) {
+			var newUser = {
+				name : 'Byron',
+				username : 'byron',
+				email : 'byron@acklenavenue.com',
+				password : 'test1234'
+			};
+			var app = org3.applications[0];
+			orgModule.addApplicationUser(org3._id, app._id, newUser).then(function(modifiedOrg) {
+				database.collection("orgs").then(function(col) {
+					col.getById(modifiedOrg._id).then(function(orgFromDatabase) {
+						orgFromDatabase.applications[0].users[0].name.should.equal(newUser.name);
+						orgFromDatabase.applications[0].users[0].username.should.equal(newUser.username);
+						orgFromDatabase.applications[0].users[0].email.should.equal(newUser.email);
+						orgFromDatabase.applications[0].users[0].password.should.equal(newUser.password);
+						orgFromDatabase.applications[0].users[0]._id.should.not.be.null
+					}).done(done);
+				});
+			});
+		});
+	});
+
+	describe("when modifying an existing application user", function() {
+		it("should change the user in the database", function(done) {
+			var org = org2;
+			var app = org.applications[0];
+			var user = app.users[0];
+			var modifications = {
+				name : 'newName',
+				username : 'newUsername',
+				email : 'newEmail'
+			};
+			orgModule.modifyApplicationUser(org._id, app._id, user._id, modifications).then(function(modifiedOrg) {
+				database.collection("orgs").then(function(col) {
+					col.getById(modifiedOrg._id).then(function(orgFromDatabase) {
+						orgFromDatabase.applications[0].users[0].name.should.equal(modifications.name);
+						orgFromDatabase.applications[0].users[0].username.should.equal(modifications.username);
+						orgFromDatabase.applications[0].users[0].email.should.equal(modifications.email);
+						orgFromDatabase.applications[0].users[0].password.should.equal(user.password);
+					}).done(done);
+				});
+			});
+		});
+	});
+
+	describe('when retrieving an app user with correct credentials', function() {
+		it("should return the user data", function(done) {
+			var org = org1;
+			var app = org.applications[0];
+			var user = app.users[0];
+			orgModule.getApplicationUser(app._id, user.username, user.password).then(function(userRetrieved) {
+				userRetrieved.username.should.equal(user.username)
+			}).done(done);
 		});
 	});
 

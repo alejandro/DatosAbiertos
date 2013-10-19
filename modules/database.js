@@ -1,10 +1,10 @@
 'use strict';
 
-var q      = require('q');
-var mongo  = require('mongodb');
+var q = require('q');
+var mongo = require('mongodb');
 var Server = mongo.Server;
-var Db     = mongo.Db;
-var BSON   = mongo.BSONPure;
+var Db = mongo.Db;
+var BSON = mongo.BSONPure;
 
 var database = function() {
 
@@ -33,6 +33,10 @@ var database = function() {
 		return BSON.ObjectID();
 	};
 
+	var getId = function(stringId) {
+		return BSON.ObjectID(stringId);
+	};
+
 	var CollectionWithPromise = ( function() {
 
 			var coll = null;
@@ -49,7 +53,7 @@ var database = function() {
 					bsonId = new BSON.ObjectID(id.toString());
 				} catch(err) {
 					var msg = 'There was a problem with the provided Id "' + id + '." '
-							msg += 'It cannot be converted to BSON Id.'
+					msg += 'It cannot be converted to BSON Id.'
 					def.reject(msg);
 				}
 				if (bsonId) {
@@ -125,15 +129,19 @@ var database = function() {
 
 			CollectionWithPromise.prototype.add = function(item) {
 				var def = q.defer();
-				coll.insert(item, {
-					safe : true
-				}, function(err) {
-					if (err) {
-						def.reject(err);
-					} else {
-						def.resolve(item);
-					}
-				});
+				if (Object.keys(item).length == 0) {
+					def.reject('Cannot add an empty item.')
+				} else {
+					coll.insert(item, {
+						safe : true
+					}, function(err) {
+						if (err) {
+							def.reject(err);
+						} else {
+							def.resolve(item);
+						}
+					});
+				}
 				return def.promise;
 			};
 
@@ -201,6 +209,7 @@ var database = function() {
 			});
 		},
 		newId : newId,
+		getId : getId,
 		collection : function(collectionName) {
 			var def = q.defer();
 			db.collection(collectionName, function(err, coll) {
@@ -214,7 +223,7 @@ var database = function() {
 		},
 		drop : function(collectionName) {
 			var def = q.defer();
-			
+
 			db.collection(collectionName, function(err, collection) {
 				return collection.remove({}, function(err, removed) {
 					def.resolve(removed);

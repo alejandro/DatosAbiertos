@@ -89,6 +89,12 @@ describe('Database', function() {
 			}).done(done);				
 		});
 		
+		it('should fail if user attempts to add an empty item', function(done){
+			col.add({}).fail(function(err){
+				err.should.equal('Cannot add an empty item.');
+			}).done(done);
+		});
+		
 		it('should be able to add an item', function(done){
 			col.add({Name:"David"}).then(function(createdItem){
 				createdItem._id.should.not.be.null;

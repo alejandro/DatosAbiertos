@@ -1,7 +1,8 @@
 ﻿requirejs.config({
     paths: {
         'text': 'durandal/amd/text',
-        'foreachprop': 'bindingHandlers/ko.foreachprop'   
+        'foreachprop': 'bindingHandlers/ko.foreachprop',
+        'underscore' : '../scripts/underscore'
     }
 });
 
