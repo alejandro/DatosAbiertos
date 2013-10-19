@@ -156,6 +156,40 @@ describe('Orgs', function() {
 		});
 	});
 
+	describe('when retrieving an app user with invalid token', function() {
+		it("should reject with the correct message", function(done) {			
+			orgModule.getApplicationUser(database.newId(), "user.username", "user.password").fail(function(err) {
+				err.should.equal("Application user was not found for given credentials. (O1)");
+			}).then(function(o){
+				if(o){
+					console.log("this should not be returning anything. It should go to the fail!!");					
+				}
+			}).done(done);
+		});
+	});
+
+	describe('when retrieving an app user with invalid username', function() {
+		it("should reject with the correct message", function(done) {			
+			var org = org1;
+			var app = org.applications[0];
+			var user = app.users[0];
+			orgModule.getApplicationUser(app._id, "invalid_username", "user.password").fail(function(err) {
+				err.should.equal("Application user was not found for given credentials. (U1)");
+			}).done(done);
+		});
+	});
+
+	describe('when retrieving an app user with invalid password', function() {
+		it("should reject with the correct message", function(done) {			
+			var org = org1;
+			var app = org.applications[0];
+			var user = app.users[0];
+			orgModule.getApplicationUser(app._id, user.username, "invalid_password").fail(function(err) {
+				err.should.equal("Application user was not found for given credentials. (U1)");
+			}).done(done);
+		});
+	});
+
 	describe('when getting all orgs for an account', function() {
 		it('should return the expected orgs where account is an admin', function(done) {
 			orgModule.create("org1", account1._id).done(function(newOrg1) {
