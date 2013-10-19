@@ -35,10 +35,8 @@ var database = function() {
 
 	var CollectionWithPromise = ( function() {
 
-			var coll = null;
-
 			function CollectionWithPromise(collection) {
-				coll = collection;
+				this.coll = collection;
 			}
 
 			var getById = function(id) {
@@ -53,7 +51,7 @@ var database = function() {
 					def.reject(msg);
 				}
 				if (bsonId) {
-					coll.findOne({
+					this.coll.findOne({
 						'_id' : bsonId
 					}, function(err, doc) {
 						if (err) {
@@ -69,12 +67,13 @@ var database = function() {
 			};
 
 			CollectionWithPromise.prototype.getById = function(id) {
-				return getById(id);
+				return getById.call(this, id);
 			};
 
 			CollectionWithPromise.prototype.modify = function(id, modification) {
 				var def = q.defer();
-				coll.update({
+				var self = this;
+				this.coll.update({
 					_id : new BSON.ObjectID(id.toString())
 				}, {
 					$set : modification
@@ -85,7 +84,7 @@ var database = function() {
 					if (err) {
 						def.reject(err);
 					} else {
-						getById(id).done(function(doc) {
+						getById.call(self, id).done(function(doc) {
 							def.resolve(doc);
 						});
 					}
@@ -111,7 +110,7 @@ var database = function() {
 						'_id' : new BSON.ObjectID(idOrQuery.toString())
 					}
 				}
-				coll.remove(query, {
+				this.coll.remove(query, {
 					safe : true
 				}, function(err) {
 					if (err) {
@@ -125,7 +124,7 @@ var database = function() {
 
 			CollectionWithPromise.prototype.add = function(item) {
 				var def = q.defer();
-				coll.insert(item, {
+				this.coll.insert(item, {
 					safe : true
 				}, function(err) {
 					if (err) {
@@ -140,7 +139,7 @@ var database = function() {
 			CollectionWithPromise.prototype.getAll = function(query) {
 				var def = q.defer();
 				query = query || {};
-				coll.find(query, function(err, cursor) {
+				this.coll.find(query, function(err, cursor) {
 					if (err) {
 						def.reject(err);
 					} else {
@@ -159,7 +158,7 @@ var database = function() {
 			CollectionWithPromise.prototype.getFirst = function(query) {
 				var def = q.defer();
 				query = query || {};
-				coll.find(query, function(err, cursor) {
+				this.coll.find(query, function(err, cursor) {
 					if (err) {
 						def.reject(err);
 					} else {
