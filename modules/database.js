@@ -48,8 +48,8 @@ var database = function() {
 
 					bsonId = new BSON.ObjectID(id.toString());
 				} catch(err) {
-					var msg = 'There was a problem with the provided Id "' + id + '". '
-							msg += 'Cannot be converted to BSON Id.'
+					var msg = 'There was a problem with the provided Id "' + id + '." '
+							msg += 'It cannot be converted to BSON Id.'
 					def.reject(msg);
 				}
 				if (bsonId) {
@@ -59,7 +59,7 @@ var database = function() {
 						if (err) {
 							def.reject(err);
 						} else if (!doc) {
-							def.reject('Could not find the record with id "' + id + '".');
+							def.reject('Could not find the record with id "' + id + '."');
 						} else {
 							def.resolve(doc);
 						}
