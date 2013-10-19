@@ -1,12 +1,12 @@
 'use strict';
 
-var passport       = require('passport');
+var passport = require('passport');
 var GoogleStrategy = require('passport-google').Strategy;
-var accounts       = require('./modules/accounts');
-var express        = require('express');
-var app            = express();
-var config         = require('./config')[app.get('env')];
-var orgs           = require('./modules/orgs');
+var accounts = require('./modules/accounts');
+var express = require('express');
+var app = express();
+var config = require('./config')[app.get('env')];
+var orgs = require('./modules/orgs');
 var googleAuthConfig = {
 	returnURL : config.baseUrl + '/login/return',
 	realm : config.baseUrl
@@ -19,7 +19,6 @@ function validateUser(identifier, profile, done) {
 	getAccount(email, done).fail(function(err) {
 		if (err == 'not found') {
 			console.log('### User not found. Creating... ');
-			console.log(profile);
 			accounts.create(email, profile.displayName, profile.name.givenName, profile.name.familyName).then(function(newAccount) {
 				console.log('### User created!');
 				console.log(newAccount);
@@ -43,18 +42,32 @@ function getAccount(email, done) {
 	console.log('Getting account by email %s...', email);
 	return accounts.getByEmail(email).then(function(account) {
 		console.log('Got account!');
-		console.log(account); //this works
+		console.log(account);
+		//this works
 		done(null, account);
 	});
 }
 
 function restrict(req, res, next) {
-	console.log('Auth\'d: ' + req.isAuthenticated());
 	if (req.isAuthenticated()) {
 		next();
 	} else {
-		console.log('User is not authenticated.')
-		res.send('Authentication required to access that feature.', 401);
+		var rejectRequest = function() {
+			console.log('User is not authenticated.')
+			res.send('Authentication required to access that feature.', 401);
+		};
+		//this is hacky. I think this should be something else, but I'll leave it to
+		//someone who knows authentication/security better than I do.
+		if (req.body.token) {
+			console.log("Checking public API user.");
+			orgs.getApplicationUser(req.body.token, req.body.username, req.body.password).then(function() {
+				next()
+			}).fail(function(err) {
+				rejectRequest();
+			});
+		} else {
+			rejectRequest();
+		}
 	}
 }
 

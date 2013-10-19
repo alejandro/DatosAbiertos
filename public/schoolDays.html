@@ -74,7 +74,7 @@
 					//now to post this to the repo
 					var schoolDays = "5259762dd709f6780100000b";
 					var token = "5262a1ca689515c720000004";
-					objToSend = $.extend(objectToSend, {token: token, username: 'test', password: 'testpass123'});
+					objToSend = $.extend(objToSend, {token: token, username: 'test', password: 'testpass123'});
 					$.post(apiBaseUrl + 'collections/' + schoolDays + '/documents', objToSend).then(function() {
 						$("#form").hide();
 						$("#thanks").show();

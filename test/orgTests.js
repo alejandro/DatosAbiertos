@@ -160,10 +160,6 @@ describe('Orgs', function() {
 		it("should reject with the correct message", function(done) {			
 			orgModule.getApplicationUser(database.newId(), "user.username", "user.password").fail(function(err) {
 				err.should.equal("Application user was not found for given credentials. (O1)");
-			}).then(function(o){
-				if(o){
-					console.log("this should not be returning anything. It should go to the fail!!");					
-				}
 			}).done(done);
 		});
 	});
