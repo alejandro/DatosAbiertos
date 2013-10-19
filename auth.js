@@ -1,8 +1,9 @@
-"use strict";
+'use strict';
 
-var passport = require('passport'), GoogleStrategy = require('passport-google').Strategy, accounts = require('./modules/accounts');
-var config = require("./config");
-
+var passport       = require('passport');
+var GoogleStrategy = require('passport-google').Strategy;
+var accounts       = require('./modules/accounts');
+var config         = require('./config');
 var googleAuthConfig = {
 	returnURL : config.baseUrl + '/login/return',
 	realm : config.baseUrl
@@ -13,17 +14,17 @@ var strategy = new GoogleStrategy(googleAuthConfig, validateUser);
 function validateUser(identifier, profile, done) {
 	var email = profile.emails[0].value;
 	getAccount(email, done).fail(function(err) {
-		if (err == "not found") {
-			console.log("### User not found. Creating... ");
+		if (err == 'not found') {
+			console.log('### User not found. Creating... ');
 			console.log(profile);
 			accounts.create(email, profile.displayName, profile.name.givenName, profile.name.familyName).then(function(newAccount) {
-				console.log("### User created!");
+				console.log('### User created!');
 				console.log(newAccount);
 				done(null, newAccount);
 			});
 		}
 	});
-};
+}
 
 passport.use(strategy);
 
@@ -36,25 +37,25 @@ passport.deserializeUser(function(email, done) {
 });
 
 function getAccount(email, done) {
-	console.log("Getting account by email " + email + "...");			
+	console.log('Getting account by email %s...', email);
 	return accounts.getByEmail(email).then(function(account) {
-		console.log("Got account!");
+		console.log('Got account!');
 		console.log(account); //this works
 		done(null, account);
 	});
-};
+}
 
 function restrict(req, res, next) {
-	console.log("Auth'd: " + req.isAuthenticated());
-	if (req.isAuthenticated() == true) {
+	console.log('Auth\'d: ' + req.isAuthenticated());
+	if (req.isAuthenticated()) {
 		next();
-	} else {	
-		console.log("User is not authenticated.")		
+	} else {
+		console.log('User is not authenticated.')
 		res.send('Authentication required to access that feature.', 401);
 	}
 }
 
-exports.authenticateWithGoogle = passport.authenticate("google", {
+exports.authenticateWithGoogle = passport.authenticate('google', {
 	failureRedirect : '/#/login?failure=yes',
 	successRedirect : '/#/'
 });

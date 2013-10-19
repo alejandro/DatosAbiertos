@@ -1,13 +1,12 @@
-"use strict";
+'use strict';
 
-var database = require("../modules/database.js");
-var q = require("q");
+var database = require('../modules/database.js');
 var _ = require('underscore');
 
 var mod = function() {
 
 	var getCollection = function() {
-		return database.collection("feeds");
+		return database.collection('feeds');
 	};
 
 	var getAll = function() {
@@ -20,7 +19,7 @@ var mod = function() {
 				var collections = [];
 				_.each(feeds, function(f) {
 					var filteredCollections = _.filter(f.collections, function(c) {
-						return c.archived != true;
+						return c.archived !== true;
 					});
 					var mappedCollections = _.map(filteredCollections, function(c){
 						return {
@@ -30,7 +29,7 @@ var mod = function() {
 						};
 					});
 					collections = collections.concat(mappedCollections);
-				});				
+				});
 				return collections;
 			});
 		});
