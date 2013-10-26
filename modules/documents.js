@@ -1,6 +1,7 @@
 'use strict';
 
 var database = require('../modules/database.js');
+var _ = require('underscore');
 
 var mod = function() {
 
@@ -8,9 +9,14 @@ var mod = function() {
 		return database.collection(collectionId.toString());
 	};
 
-	var getAll = function(collectionId) {
+	var getAll = function(collectionId, query) {
 		return getCollection(collectionId).then(function(col) {
-			return col.getAll({archived: {$ne:true}});
+			query = _.extend(query || {}, {
+				archived : {
+					$ne : true
+				}
+			});
+			return col.getAll(query);
 		});
 	};
 

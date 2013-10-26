@@ -33,33 +33,41 @@ describe('Feeds', function() {
 	};
 
 	beforeEach(function(done) {
-		database.collection("orgs").then(function(c) {
-			c.add(org1).then(function() {
-				c.add(org2).then(function() {
-
-					feed1.orgId = org1._id.toString();
-					feed2.orgId = org2._id.toString();
-					feed3.orgId = org1._id.toString();
-
-					database.collection("feeds").then(function(coll) {
-						coll.add(feed1).then(function() {
-							return coll.add(feed2);
-						}).then(function() {
-							return coll.add(feed3);
-						});
-					}).done(done);
-				})
-			});
-		});
-	});
-
-	afterEach(function(done) {
 		var deleteAll = function(collectionName, callback) {
 			database.currentConnection().collection(collectionName, function(err, coll) {
 				coll.remove({}, callback);
 			});
 		}
-		deleteAll("orgs", deleteAll("feeds", done));
+		var addFeeds = function(callback) {
+			database.collection("orgs").then(function(c) {
+				c.add(org1).then(function() {
+					c.add(org2).then(function() {
+
+						feed1.orgId = org1._id.toString();
+						feed2.orgId = org2._id.toString();
+						feed3.orgId = org1._id.toString();
+
+						database.collection("feeds").then(function(coll) {
+							coll.add(feed1).then(function() {
+								return coll.add(feed2);
+							}).then(function() {
+								return coll.add(feed3);
+							}).then(function() {
+								callback();
+							});
+						});
+					})
+				});
+			});
+		};
+		
+		deleteAll("orgs", function() {
+			deleteAll("feeds", function() {
+				addFeeds(function() {
+					done();
+				});
+			})
+		});
 	});
 
 	describe('when getting a list of feeds', function() {

@@ -1,8 +1,8 @@
 
 module.exports = {
   development: {
-    port: process.env.PORT || 3000,
-    baseUrl: 'http://localhost:3000',
+    port: process.env.PORT || 3001,
+    baseUrl: 'http://localhost:3001',
     db: {
       host: 'localhost',
       port: 27017,

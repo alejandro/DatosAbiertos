@@ -120,6 +120,7 @@ var mod = function() {
 			}).fail(function(err){
 				def.reject("Application user was not found for given credentials. (O1)")
 			}).then(function(org){
+			
 				var app = _.find(org.applications, function(a) {
 					return a._id.toString() == appId.toString()
 				});

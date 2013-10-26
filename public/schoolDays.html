@@ -47,40 +47,64 @@
 		<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
 		<script type='text/javascript'>
 			$(document).ready(function() {
-				var apiBaseUrl = "http://localhost:3000/";
+				var apiBaseUrl = "http://localhost:3001/";
 				var schoolsCollectionId = "525975a7d709f67801000003";
 
-				var date = new Date();
+				var schoolDays = "5259762dd709f6780100000b";
+				var token = "5262a1ca689515c720000004";
+				var username = 'test';
+				var password = 'testpass123';
 
-				$("#today").html(date);
-
-				//Populate schools drop-down
-				$.get(apiBaseUrl + 'collections/' + schoolsCollectionId + '/documents').then(function(schools) {
-					var schoolOptions = $("#schools");
-					$.each(schools, function() {
-						schoolOptions.append($("<option />").val(this._id).text(this.Name));
+				var login = function(username, password, token) {
+					return $.ajax({
+						type : "GET",
+						cache : false,
+						url : apiBaseUrl + 'api/auth?token=' + token,
+						username : username,
+						password : password
 					});
-				});
+				};
 
-				$("#send").click(function() {
-				
-					var shortDate = (date.getMonth() + 1) + '/' + date.getDate() + '/' +  date.getFullYear();
-					var objToSend = {
-						'School Id' : $("#schools").val(),
-						'Date' : shortDate,
-						'Open' : $("input:radio[name='open']:checked").val()
+				login(username, password, token).then(function(user) {
+
+					console.log(user);
+
+					var date = new Date();
+
+					$("#today").html(date);
+
+					//Populate schools drop-down
+					var query = {
+						$where : "(this.Workers||'').indexOf('" + user.username + "')>-1"
 					};
-
-					//now to post this to the repo
-					var schoolDays = "5259762dd709f6780100000b";
-					var token = "5262a1ca689515c720000004";
-					objToSend = $.extend(objToSend, {token: token, username: 'test', password: 'testpass123'});
-					$.post(apiBaseUrl + 'collections/' + schoolDays + '/documents', objToSend).then(function() {
-						$("#form").hide();
-						$("#thanks").show();
+					$.get(apiBaseUrl + 'collections/' + schoolsCollectionId + '/documents' + '?query=' + JSON.stringify(query)).then(function(schools) {
+						if (schools.length == 0) {
+							alert("No schools found for " + user.username + "!");
+						}
+						var schoolOptions = $("#schools");
+						console.log(schools.length);
+						$.each(schools, function() {
+							schoolOptions.append($("<option />").val(this._id).text(this.Name));
+						});
 					});
 
+					$("#send").click(function() {
+
+						var shortDate = (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
+						var objToSend = {
+							'School Id' : $("#schools").val(),
+							'Date' : shortDate,
+							'Open' : $("input:radio[name='open']:checked").val()
+						};
+
+						$.post(apiBaseUrl + 'collections/' + schoolDays + '/documents', objToSend).then(function() {
+							$("#form").hide();
+							$("#thanks").show();
+						});
+
+					});
 				});
+
 			});
 		</script>
 	</body>

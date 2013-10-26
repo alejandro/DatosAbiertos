@@ -58,8 +58,7 @@ describe('Documents', function() {
 
 	describe('when attempting to add empty data to a collection', function() {
 		it('should raise the expected error', function(done) {
-			collectionDataModule.addData(collection._id, {})
-			.fail(function(err) {
+			collectionDataModule.addData(collection._id, {}).fail(function(err) {
 				err.should.equal('Cannot add an empty item.');
 			}).done(done);
 		});
@@ -90,6 +89,52 @@ describe('Documents', function() {
 					documents[0].name.should.equal("test");
 					documents[0].color.should.equal("red");
 					documents[0].cost.should.equal(5);
+					documents[0].paidOn.toString().should.equal(now.toString());
+					documents[0]._id.should.not.be.null;
+
+				}).done(done);
+			});
+		});
+	});
+
+	describe('when querying data for a collection', function() {
+		it('should return the expected queried data', function(done) {
+
+			var now = new Date();
+
+			database.collection(collection._id.toString()).then(function(c) {
+				c.add({
+					name : "test2",
+					color : "red",
+					cost : 5,
+					paidOn : now
+				});
+				return c;
+			}).then(function(c) {
+				c.add({
+					name : "test1",
+					color : "blueberry",
+					cost : 10,
+					paidOn : now
+				});
+				return c;
+			}).then(function(c) {
+				c.add({
+					name : "test3",
+					cost : 10,
+					paidOn : now
+				});
+			}).done(function() {
+
+				var query = {					
+					"$where" : "(this.color||'').indexOf('blue')>-1"
+				};
+				
+				collectionDataModule.getAll(collection._id, query).then(function(documents) {
+					documents.length.should.equal(1);
+					documents[0].name.should.equal("test1");
+					documents[0].color.should.equal("blueberry");
+					documents[0].cost.should.equal(10);
 					documents[0].paidOn.toString().should.equal(now.toString());
 					documents[0]._id.should.not.be.null;
 

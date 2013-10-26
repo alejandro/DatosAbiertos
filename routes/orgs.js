@@ -1,13 +1,13 @@
 'use strict';
 
-var orgModule     = require('../modules/orgs');
-var feedModule    = require('../modules/feeds');
+var orgModule = require('../modules/orgs');
+var feedModule = require('../modules/feeds');
 var accountModule = require('../modules/accounts');
-var auth          = require('../auth');
+var auth = require('../auth');
 
 module.exports.init = function(app) {
 
-	app.get('/orgs', auth.restrict, function(req, res) {
+	app.get('/orgs', auth.restrictRole('admin'), function(req, res) {
 		accountModule.getByEmail(req.user.email).then(function(account) {
 			orgModule.getAllForAccount(account._id).then(function(orgs) {
 				console.log('Returning %d orgs.', orgs.length);
@@ -23,12 +23,14 @@ module.exports.init = function(app) {
 		});
 	});
 
-	app.post('/orgs/:orgId/feeds', auth.restrict, function(req, res){
-		feedModule.create(req.body.name, req.params.orgId).done(function(){
-			res.json({status:'ok'});
+	app.post('/orgs/:orgId/feeds', auth.restrict, function(req, res) {
+		feedModule.create(req.body.name, req.params.orgId).done(function() {
+			res.json({
+				status : 'ok'
+			});
 		});
 	});
-	
+
 	app.get('/orgs/:id', auth.restrict, function(req, res) {
 		orgModule.getById(req.params.id).then(function(org) {
 			res.json(org);
@@ -44,7 +46,7 @@ module.exports.init = function(app) {
 			});
 		});
 	});
-	
+
 	app.post('/orgs/:orgId/applications', function(req, res) {
 		orgModule.addApplication(req.params.orgId, req.body.name).then(function() {
 			res.json({
@@ -52,7 +54,7 @@ module.exports.init = function(app) {
 			});
 		});
 	});
-	
+
 	app.post('/orgs/:orgId/applications/:appId/users', function(req, res) {
 		orgModule.addApplicationUser(req.params.orgId, req.params.appId, req.body).then(function() {
 			res.json({
@@ -60,7 +62,7 @@ module.exports.init = function(app) {
 			});
 		});
 	});
-	
+
 	app.put('/orgs/:orgId/applications/:appId/users/:userId', function(req, res) {
 		orgModule.modifyApplicationUser(req.params.orgId, req.params.appId, req.params.userId, req.body).then(function() {
 			res.json({

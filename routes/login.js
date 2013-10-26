@@ -14,6 +14,10 @@ module.exports.init = function(app) {
 		res.end();
 	});
 	
+	app.get('/api/auth', auth.authenticateWithUserAndToken, function(req, res){
+		res.json(req.user);	
+	});
+	
 	app.get('/logout', function(req, res) {
 		req.logout();
 		res.redirect('/#/login');
