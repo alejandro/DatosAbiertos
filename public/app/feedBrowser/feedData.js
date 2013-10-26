@@ -26,11 +26,26 @@ define(['server'], function(server) {
 					dataType : dataType
 				});
 			},
+			getDocument : function(collectionId, documentId) {
+				return api.get("collections/" + collectionId + "/documents").then(function(docs) {
+					console.log(documentId);
+					console.log(docs[0]);
+					return _.find(docs, function(d) {
+						return d._id == documentId
+					});
+				});
+			},
 			getCollectionData : function(collectionId, page, itemsPerPage) {
 				return api.get("collections/" + collectionId + "/documents");
 			},
 			addDataToCollection : function(collectionId, doc) {
 				return api.post("collections/" + collectionId + "/documents", doc);
+			},
+			modifyDocument : function(collectionId, documentId, changes) {
+				return api.put("collections/" + collectionId + "/documents/" + documentId, changes);
+			},
+			archiveDocument : function(collectionId, documentId) {
+				return api.delete("collections/" + collectionId + "/documents/" + documentId);
 			}
 		};
 	}(server);

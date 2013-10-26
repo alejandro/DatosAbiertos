@@ -11,7 +11,7 @@ module.exports.init = function(app) {
 		var theUrl = url.parse(req.url);
 		var queryObj = queryString.parse(theUrl.query);
 		var query;
-		if(queryObj.query)
+		if (queryObj.query)
 			query = JSON.parse(queryObj.query);
 		//need json validation here to return a helpful message in case the json is malformed.
 		dataModule.getAll(req.params.collectionId, query).then(function(documents) {
@@ -31,8 +31,7 @@ module.exports.init = function(app) {
 		});
 	});
 
-	app.
-	delete ('/collections/:collectionId/documents/:documentId', auth.restrict,
+	app.delete ('/collections/:collectionId/documents/:documentId', auth.restrict,
 	function(req, res) {
 		dataModule.archiveDocument(req.params.collectionId, req.params.documentId).then(function() {
 			res.json({
@@ -40,28 +39,13 @@ module.exports.init = function(app) {
 			});
 		})
 	});
-	//
-	// app.get('/feeds/:id', auth.restrict, function(req, res) {
-	// feedModule.get(req.params['id']).then(function(feed) {
-	// res.json(feed);
-	// });
-	// });
-	//
-	//
-	// app.post('/feeds/:feedId/collections/:collectionId/fields', function(req, res) {
-	// console.log(req.body);
-	// feedModule.addField(req.params['feedId'], req.params['collectionId'], req.body.name, req.body.dataType).then(function() {
-	// res.json({
-	// status : 'ok'
-	// });
-	// });
-	// });
-	//
-	// app.put('/feeds/:feedId/collections/:collectionId/fields/:fieldId', function(req, res) {
-	// feedModule.modifyField(req.params['feedId'], req.params['collectionId'], req.params['fieldId'], req.body.name, req.body.dataType).then(function() {
-	// res.json({
-	// status : 'ok'
-	// });
-	// });
-	// });
+
+	app.put('/collections/:collectionId/documents/:documentId', auth.restrict, function(req, res) {
+		dataModule.modify(req.params['collectionId'], req.params['documentId'], req.body).then(function() {
+			res.json({
+				status : 'ok'
+			});
+		});
+	});
+
 };

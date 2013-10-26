@@ -1,0 +1,21 @@
+<div class="messageBox">
+    <div class="modal-header">
+        <h3>Modifying Data in <span data-bind="html: collectionName"></span></h3>
+    </div>
+    <div class="modal-body">
+        <form data-bind="submit: modify">
+        	<table>
+        		<tbody data-bind="foreach: fields">
+        			<tr>
+        				<th><span data-bind="html: name"></span></th>
+        				<td><input type='text' data-bind='value: value'></td>
+        			</tr>
+        		</tbody>
+        	</table>        	
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" data-bind="click: modify">Modify</button>
+    </div>
+</div>
+

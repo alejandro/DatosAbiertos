@@ -10,8 +10,14 @@
 			</tr>
 		</thead>
 		<tbody data-bind="foreach: data">
-			<tr data-bind="foreachprop: $data">
+			<tr>
+				<!-- ko foreachprop: $data -->
+				<!-- ko if: key != '_id' -->
 				<td><span data-bind="html: value"></span></td>
+				<!-- /ko -->
+				<!-- /ko -->
+				<td><a href='' data-bind="click: $parent.modifyDocument">Modify</a></td>
+				<td><a href='' data-bind="click: $parent.archiveDocument">Archive</a></td>
 			</tr>
 		</tbody>
 	</table>

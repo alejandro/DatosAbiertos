@@ -13,7 +13,33 @@ describe('Documents', function() {
 	};
 
 	beforeEach(function(done) {
-		database.drop(collection._id.toString()).then(done);
+		database.drop(collection._id.toString()).then(function(){
+			done();
+		});		
+	});
+
+	describe("when modifying the data in a document", function() {
+		it("should update the document in the database", function(done) {
+
+			var testDocument = {
+				name : "test",
+				color : "red"
+			};
+			
+			var changes = {
+				name: 'newName',
+				color : 'red robin'
+			};
+
+			database.collection(collection._id.toString()).then(function(c) {
+				c.add(testDocument).then(function(doc) {				
+					collectionDataModule.modify(collection._id, doc._id, changes).then(function(modifiedDocument) {
+						modifiedDocument.name.should.equal(changes.name);
+						modifiedDocument.color.should.equal(changes.color);
+					}).done(done);
+				});
+			});
+		});
 	});
 
 	describe('when archiving a document in a collection', function() {
@@ -126,10 +152,10 @@ describe('Documents', function() {
 				});
 			}).done(function() {
 
-				var query = {					
+				var query = {
 					"$where" : "(this.color||'').indexOf('blue')>-1"
 				};
-				
+
 				collectionDataModule.getAll(collection._id, query).then(function(documents) {
 					documents.length.should.equal(1);
 					documents[0].name.should.equal("test1");

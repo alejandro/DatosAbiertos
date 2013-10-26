@@ -20,6 +20,12 @@ var mod = function() {
 		});
 	};
 
+	var modify = function(collectionId, documentId, changes) {
+		return getCollection(collectionId).then(function(col) {
+			return col.modify(documentId, changes);
+		});
+	};
+
 	var addData = function(collectionId, doc) {
 		return getCollection(collectionId).then(function(col) {
 			return col.add(doc);
@@ -37,7 +43,8 @@ var mod = function() {
 	return {
 		getAll : getAll,
 		addData : addData,
-		archiveDocument : archiveDocument
+		archiveDocument : archiveDocument,
+		modify : modify
 	};
 }();
 

@@ -15,3 +15,5 @@ ko.bindingHandlers.foreachprop = {
         return { controlsDescendantBindings: true };
     }
 };
+
+ko.virtualElements.allowedBindings.foreachprop = true;
