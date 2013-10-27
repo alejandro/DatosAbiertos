@@ -68,10 +68,12 @@ describe('Collections', function() {
 				return coll.add(feed2);
 			}).then(function() {
 				return coll.add(feed3);
+			}).then(function(){
+				done();
 			}).fail(function(err) {
-				console.log(err);
+				done(err);
 			});
-		}).then(done);
+		});
 	});
 
 	afterEach(function(done) {

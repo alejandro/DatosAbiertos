@@ -2,6 +2,8 @@ Facebook group - https://www.facebook.com/groups/292877094176167/
 
 Live site (during development) - http://datosabiertoshn.aws.af.cm
 
+[![Build Status](https://travis-ci.org/AcklenAvenue/DatosAbiertos.png)](https://travis-ci.org/AcklenAvenue/DatosAbiertos)
+
 Datos Abiertos para una Honduras más Abierta
 =========
 Honduras es un país donde cada hora con 20 minutos una persona muere y donde la tasa de homicidios es 85.5 por cada 100,000 habitantes; en Honduras literalmente un puede salirse con la suya cuando comete un homicidio. El Centro de Estudios Just the Facts nos informa que, mientras las elecciones generales de Honduras están programadas para Noviembre 2013, el país actualmente se enfrenta a muchos problemas financieros, por lo que es su lucha para pagar la deuda externa e interna. Honduras ha estado al borde de la bancarrota por meses - a los empleados públicos no se les ha pagado y los servicios públicos básicos han sido suspendidos. Insight Crime reporta que el gobierno no puede acceder a _$500 millones_ de los bienes confiscados a los criminales en los últimos tres años debido a la ineficiencia, corrupción y lavado de dinero. Creando un Repositorio Abierto de Datos de todos los datos de las organizaciones sin fines de lucro, cívicas y grupos de vigilancia mantienen localmente para monitorear la corrupción y el gasto del gobierno; se puede crear un lugar centralizado para que los grupos sean más eficientes y segura creando la rendición de cuentas sobre los datos abiertos.
