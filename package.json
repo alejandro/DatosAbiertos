@@ -1,13 +1,12 @@
 {
   "name": "DatosAbiertos",
-  "version": "0.0.0",
+  "version": "0.0.0-5",
   "main": "app.js",
   "directories": {
     "test": "test"
   },
   "dependencies": {
     "connect-mongodb": "~1.1.5",
-
     "mongodb": "~1.2.14",
     "passport": "~0.1.17",
     "passport-google": "~0.3.0",
@@ -29,7 +28,8 @@
     "mocha": "~1.10.0"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",
@@ -37,5 +37,9 @@
   },
   "bugs": {
     "url": "https://github.com/AcklenAvenue/DatosAbiertos/issues"
+  },
+  "subdomain": "datosabiertos",
+  "engines": {
+    "node": "0.10.x"
   }
 }
