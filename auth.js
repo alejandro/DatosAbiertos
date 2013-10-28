@@ -2,7 +2,7 @@
 
 var passport = require('passport');
 var GoogleStrategy = require('passport-google').Strategy;
-var BasicWithTokenStrategy = require('passport-http').BasicWithTokenStrategy;
+var BasicWithTokenStrategy = require('./modules/authWithToken');
 var accounts = require('./modules/accounts');
 var express = require('express');
 var app = express();

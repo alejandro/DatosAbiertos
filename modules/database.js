@@ -2,6 +2,7 @@
 
 var q      = require('q');
 var mongo  = require('mongodb');
+var conf  = require('../config')[process.env.NODE_ENV || 'development'];
 var Server = mongo.Server;
 var Db     = mongo.Db;
 var BSON   = mongo.BSONPure;
@@ -23,7 +24,14 @@ var database = function() {
 			if (err) {
 				def.reject(err);
 			} else {
-				def.resolve(db);
+				if (conf.db.user) {
+					db.authenticate(conf.db.user, conf.db.password, function(err, replies){
+						if (err) return def.reject(err)
+						def.resolve(db)
+					});
+				} else {
+					def.resolve(db);
+				}
 			}
 		});
 		return def.promise;

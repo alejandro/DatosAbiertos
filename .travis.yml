@@ -1,8 +1,11 @@
 language: node_js
-
 node_js:
-  - "0.10"
-  - "0.11"
-
+- '0.10'
+- '0.11'
 services:
-  - mongodb
+- mongodb
+deploy:
+  provider: nodejitsu
+  user: sommardahl
+  api_key:
+    secure: mnRi82nyZntvALuAW46SzBN9KACh6VL7xgyznwIq5Gjh+4/Ve7XTfC64lSS1zcfnIH1SiZoKt9hxq1BJKZ0EdLZ9KelLSSXK82IgmgVE/U3Vn2sf4pz690ePsmFC93EC0wJmJ9bdOSeVss56/fLBREeG3K1o6srXkRo2GloA4WM=

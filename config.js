@@ -1,7 +1,7 @@
-
+var env = process.env
 module.exports = {
   development: {
-    port: process.env.PORT || 3001,
+    port: env.PORT || 3001,
     baseUrl: 'http://localhost:3001',
     db: {
       host: 'localhost',
@@ -10,12 +10,14 @@ module.exports = {
     }
   },
   production: {
-    port: process.env.PORT || 80,
-    baseUrl: 'http://datosabiertoshn.aws.af.cm',
+    port: env.PORT || 80,
+    baseUrl: 'http://datosabiertos.nodejitsu.com',
     db: {
-      host: 'localhost',
-      port: 27017,
-      name: 'DatosAbiertos'
+      host: env.MONGO_HOST,
+      port: env.MONGO_PORT,
+      password: env.MONGO_PASS,
+      user: env.MONGO_USER,
+      name: env.MONGO_DB
     }
   }
 };
