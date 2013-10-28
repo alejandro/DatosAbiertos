@@ -1,6 +1,6 @@
 Facebook group - https://www.facebook.com/groups/292877094176167/
 
-Live site (during development) - http://datosabiertoshn.aws.af.cm
+Live site (during development) - http://datosabiertos.jit.su
 
 [![Build Status](https://travis-ci.org/AcklenAvenue/DatosAbiertos.png)](https://travis-ci.org/AcklenAvenue/DatosAbiertos)
 
