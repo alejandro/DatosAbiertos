@@ -56,7 +56,8 @@ describe('Orgs', function() {
 			return database.currentConnection().collection(collectionName, function(err, coll) {
 				coll.remove({}, callback);
 			});
-		}
+		};
+		
 		var createTestData = function() {
 			return database.collection("accounts").then(function(accountsColl) {
 				return accountsColl.add(userId, account1);

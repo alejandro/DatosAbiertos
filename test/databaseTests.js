@@ -183,7 +183,7 @@ describe('Database', function() {
 					
 					var history = itemInDatabase.history[itemInDatabase.history.length-1];
 					history.userId.toString().should.equal(userId.toString());
-					history.time.should.equal(now);
+					expect(history.time).to.be.at.least(now);
 					history.action.should.equal("modified");
 					JSON.stringify(history.changes).should.equal(JSON.stringify(changes));
 				}).done(done);
