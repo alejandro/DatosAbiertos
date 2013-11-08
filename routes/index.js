@@ -3,6 +3,7 @@
 var routes = function() {
 
 	var feeds       = require('./feeds');
+	var validation       = require('./validation');
 	var orgs        = require('./orgs');
 	var documents   = require('./documents');
 	var collections = require('./collections');
@@ -13,6 +14,9 @@ var routes = function() {
 			
 			console.log('Initializing feeds routes...');
 			feeds.init(app);
+			
+			console.log('Initializing validation routes...');
+			validation.init(app);
 			
 			console.log('Initializing orgs routes...');
 			orgs.init(app);
@@ -30,7 +34,8 @@ var routes = function() {
 		feeds : feeds,
 		orgs : orgs,
 		login : login,
-		documents: documents
+		documents: documents,
+		validation: validation
 	}
 }();
 
