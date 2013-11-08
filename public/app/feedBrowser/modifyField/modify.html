@@ -2,5 +2,24 @@
 
 <p> Name: <input type='text' data-bind="value: name"/></p>
 <p> Data Type: <select data-bind="options: dataTypes, value: selectedDataType"/></p>
+
+<p>Validation Rules:</p>
+<table>
+	<tbody data-bind="foreach: rules">
+		<tr>
+			<td><span data-bind="html: name"></span></td>
+			<td><span data-bind="html: value"></span></td>
+			<td><button data-bind="click: $parent.removeValidationRule">Remove</button></td>
+		</tr>
+	</tbody>
+	<tfoot>
+		<tr>
+			<td><select data-bind="options: validatorTypes, optionsText: 'name', value: selectedValidatorType"></select></td>
+			<td><input data-bind="value: selectedValidatorValue"></td>
+			<td><button data-bind="click: addValidationRule">Add</button></td>
+		</tr>
+	</tfoot>
+</table>
+
 <p><button data-bind="click: save">Save</button></p>
 <div data-bind="visible: saved">Saved</div>

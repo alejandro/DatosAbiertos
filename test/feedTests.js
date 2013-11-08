@@ -62,7 +62,7 @@ describe('Feeds', function() {
 				});
 			});
 		};
-		
+
 		deleteAll("orgs", function() {
 			deleteAll("feeds", function() {
 				addFeeds(function() {
@@ -145,12 +145,18 @@ describe('Feeds', function() {
 	describe("when adding a field to a collection", function() {
 		it("should add the field in the database", function(done) {
 			//feed3 is the one with an existing collection
-			feedModule.addField(userId, feed3._id, feed3.collections[0]._id, "field name", "number").then(function(modifiedFeed) {
+			var rules = [{
+						code : 'something'
+					}];
+
+			feedModule.addField(userId, feed3._id, feed3.collections[0]._id, "field name", "number", rules).then(function(modifiedFeed) {
 				database.collection("feeds").then(function(col) {
 					col.getById(modifiedFeed._id).then(function(feedFromDatabase) {
 						feedFromDatabase.collections[0].fields[0].name.should.equal("field name");
 						feedFromDatabase.collections[0].fields[0].dataType.should.equal("number");
 						feedFromDatabase.collections[0].fields[0]._id.should.not.be.null;
+						feedFromDatabase.collections[0].fields[0].rules[0].code.should.equal('something');
+
 					}).done(done);
 				});
 			});
@@ -164,12 +170,16 @@ describe('Feeds', function() {
 				var collection = modifiedFeed.collections[0];
 				feedModule.addField(userId, feedId, collection._id, "old field name").then(function(modifiedFeedWithField) {
 					var field = modifiedFeedWithField.collections[0].fields[0];
+					var rules = [{
+						code : 'something'
+					}];
 
-					feedModule.modifyField(userId, feedId, collection._id, field._id, "new name", "date").then(function(feedWithModifiedField) {
+					feedModule.modifyField(userId, feedId, collection._id, field._id, "new name", "date", rules).then(function(feedWithModifiedField) {
 						var modifiedField = feedWithModifiedField.collections[0].fields[0];
 
 						modifiedField.name.should.equal("new name");
 						modifiedField.dataType.should.equal("date");
+						modifiedField.rules[0].code.should.equal('something');
 
 					}).done(done);
 				});

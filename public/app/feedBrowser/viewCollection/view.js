@@ -24,7 +24,8 @@ define(['feedBrowser/feedData', 'durandal/app'], function(feedData, app) {
 
 		var addField = function() {
 			app.showModal('feedBrowser/createField/create').then(function(newField) {
-				feedData.addField(newField.name, newField.dataType, feedId(), collectionId()).then(function() {
+				var rules = [];
+				feedData.addField(newField.name, newField.dataType, rules, feedId(), collectionId()).then(function() {
 					loadFields();
 				});
 			});

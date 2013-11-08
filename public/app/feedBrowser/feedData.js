@@ -3,6 +3,9 @@ define(['server'], function(server) {
 	var feedData = function(api) {
 
 		return {
+			getValidators : function(dataType) {
+				return api.get("validatorTypes/"+ dataType);
+			},
 			getAll : function() {
 				return api.get("feeds");
 			},
@@ -14,16 +17,18 @@ define(['server'], function(server) {
 					name : name
 				});
 			},
-			addField : function(name, dataType, feedId, collectionId) {
+			addField : function(name, dataType, rules, feedId, collectionId) {
 				return api.post("feeds/" + feedId + "/collections/" + collectionId + "/fields", {
 					name : name,
-					dataType : dataType
+					dataType : dataType,
+					rules: rules
 				});
 			},
-			modifyField : function(name, dataType, feedId, collectionId, fieldId) {
+			modifyField : function(name, dataType, rules, feedId, collectionId, fieldId) {
 				return api.put("feeds/" + feedId + "/collections/" + collectionId + "/fields/" + fieldId, {
 					name : name,
-					dataType : dataType
+					dataType : dataType,
+					rules: rules
 				});
 			},
 			getDocument : function(collectionId, documentId) {
