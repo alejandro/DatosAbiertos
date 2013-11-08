@@ -77,7 +77,7 @@ var mod = function() {
 		});
 	};
 
-	var addField = function(userId, feedId, collectionId, name, dataType) {
+	var addField = function(userId, feedId, collectionId, name, dataType, rules) {
 		return getCollection().then(function(col) {
 			return col.getById(feedId).then(function(feed) {
 				var collections = _.map(feed.collections, function(c) {
@@ -88,7 +88,8 @@ var mod = function() {
 						fields.push({
 							_id : database.newId(),
 							name : name,
-							dataType: dataType || 'text'
+							dataType: dataType || 'text',
+							rules: rules || []
 						});
 						c.fields = fields;
 					}
@@ -102,7 +103,7 @@ var mod = function() {
 		});
 	};
 
-	var modifyField = function(userId, feedId, collectionId, fieldId, name, dataType) {
+	var modifyField = function(userId, feedId, collectionId, fieldId, name, dataType, rules) {
 		return getCollection().then(function(col) {
 			return col.getById(feedId).then(function(feed) {
 
@@ -116,6 +117,7 @@ var mod = function() {
 
 								f.name = name;
 								f.dataType = dataType;
+								f.rules = rules;
 							}
 
 							return f;
