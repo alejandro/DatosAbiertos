@@ -13,7 +13,8 @@
     "passport-google-oauth": "~0.1.5",
     "q": "~0.9.5",
     "underscore": "~1.4.4",
-    "express": "~3.1.0"
+    "express": "~3.1.0",
+    "moment" : "~2.4.0"
   },
   "devDependencies": {
     "grunt-concat": "~0.1.6",

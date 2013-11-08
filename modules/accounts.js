@@ -17,9 +17,9 @@ var mod = function() {
 		});
 	};
 
-	var create = function(email, displayName, firstName, lastName) {
+	var create = function(userId, email, displayName, firstName, lastName) {
 		return getCollection().then(function(col) {
-			return col.add({
+			return col.add(userId, {
 				email : email,
 				displayName : displayName,
 				firstName : firstName,
@@ -28,12 +28,12 @@ var mod = function() {
 		});
 	};
 
-	var addOrg = function(accountId, org) {
+	var addOrg = function(userId, accountId, org) {
 		return getCollection().then(function(col) {
 			return col.getById(accountId).then(function(account) {
 				var orgIds = account.orgs || [];
 				orgIds.push(org._id.toString());
-				return col.modify(accountId, {
+				return col.modify(userId, accountId, {
 					orgs : orgIds
 				});
 			});

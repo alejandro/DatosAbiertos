@@ -7,6 +7,8 @@ var q = require("q");
 
 describe('Accounts', function() {
 
+	var userId = database.newId();
+	
 	var account1 = {
 		email : "byron@acklenavenue.com"
 	};
@@ -19,10 +21,10 @@ describe('Accounts', function() {
 
 	beforeEach(function(done) {
 		database.collection("accounts").then(function(coll) {
-			coll.add(account1).then(function() {
-				return coll.add(account2);
+			coll.add(userId, account1).then(function() {
+				return coll.add(userId, account2);
 			}).then(function() {
-				return coll.add(account3);
+				return coll.add(userId, account3);
 			});
 		}).done(done);
 	});
@@ -50,7 +52,7 @@ describe('Accounts', function() {
 			var lastName = "Appleseed";
 			var email = "johnny@appleseed.com";
 
-			accountModule.create(email, displayName, firstName, lastName).then(function(newAccount) {
+			accountModule.create(userId, email, displayName, firstName, lastName).then(function(newAccount) {
 				database.collection("accounts").then(function(col) {
 					col.getById(newAccount._id).then(function(accountInDatabase) {
 						accountInDatabase.displayName.should.equal(displayName);

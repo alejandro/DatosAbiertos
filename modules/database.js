@@ -1,11 +1,12 @@
 'use strict';
 
-var q      = require('q');
-var mongo  = require('mongodb');
-var conf  = require('../config')[process.env.NODE_ENV || 'development'];
+var q = require('q');
+var mongo = require('mongodb');
+var conf = require('../config')[process.env.NODE_ENV || 'development'];
 var Server = mongo.Server;
-var Db     = mongo.Db;
-var BSON   = mongo.BSONPure;
+var Db = mongo.Db;
+var BSON = mongo.BSONPure;
+var moment = require('moment');
 
 var database = function() {
 
@@ -25,8 +26,9 @@ var database = function() {
 				def.reject(err);
 			} else {
 				if (conf.db.user) {
-					db.authenticate(conf.db.user, conf.db.password, function(err, replies){
-						if (err) return def.reject(err)
+					db.authenticate(conf.db.user, conf.db.password, function(err, replies) {
+						if (err)
+							return def.reject(err)
 						def.resolve(db)
 					});
 				} else {
@@ -59,7 +61,7 @@ var database = function() {
 					bsonId = new BSON.ObjectID(id.toString());
 				} catch(err) {
 					var msg = 'There was a problem with the provided Id "' + id + '." '
-							msg += 'It cannot be converted to BSON Id.'
+					msg += 'It cannot be converted to BSON Id.'
 					def.reject(msg);
 				}
 				if (bsonId) {
@@ -82,30 +84,59 @@ var database = function() {
 				return getById.call(this, id);
 			};
 
-			CollectionWithPromise.prototype.modify = function(id, modification) {
-				var def = q.defer();
+			CollectionWithPromise.prototype.modify = function(userId, id, modification) {
 				var self = this;
 				delete modification._id;
-				this.coll.update({
-					_id : new BSON.ObjectID(id.toString())
-				}, {
-					$set : modification
-				}, {
-					upsert : false,
-					safe : true
-				}, function(err, recordsUpdate) {
-					if (err) {
-						console.log(err);
-						def.reject(err);
-					} else {
-						getById.call(self, id).done(function(doc) {
-							def.resolve(doc);
-						});
+
+				var modSet = {
+					$set : modification,
+					$push : {
+						history : {
+							userId : userId,
+							action : "modified",
+							time : moment().valueOf(),
+							changes : modification
+						}
 					}
-				});
-				return def.promise;
+				};
+
+				return makeUpdate(self, id, modSet);				
 			};
 
+			CollectionWithPromise.prototype.archive = function(userId, itemId) {
+				var self = this;
+				
+				var modSet = {
+					$set : { archived : true},
+					$push : {
+						history : {
+							userId : userId,
+							action : "archived",
+							time : moment().valueOf()							
+						}
+					}			
+				};
+
+				return makeUpdate(self, itemId, modSet);				
+			};
+			
+			CollectionWithPromise.prototype.unarchive = function(userId, itemId) {
+				var self = this;
+				
+				var modSet = {
+					$set : { archived : false},
+					$push : {
+						history : {
+							userId : userId,
+							action : "unarchived",
+							time : moment().valueOf()							
+						}
+					}			
+				};
+
+				return makeUpdate(self, itemId, modSet);				
+			};
+			
 			CollectionWithPromise.prototype.remove = function(idOrQuery) {
 				var def = q.defer();
 				var query = idOrQuery;
@@ -136,11 +167,26 @@ var database = function() {
 				return def.promise;
 			};
 
-			CollectionWithPromise.prototype.add = function(item) {
+			CollectionWithPromise.prototype.add = function(userId, item) {
 				var def = q.defer();
-				if (Object.keys(item).length == 0) {
+				if ( typeof item === null) {
+					def.reject('item is null');
+				}
+				if ( typeof item === 'undefined') {
+					def.reject('item is undefined');
+				}
+				if ( typeof item !== 'object') {
+					def.reject(JSON.stringify(item) + ' is not an object');
+				} else if (Object.keys(item).length == 0) {
 					def.reject('Cannot add an empty item.')
 				} else {
+
+					item.history = [{
+						userId : new BSON.ObjectID(userId.toString()),
+						action : "created",
+						time : moment().valueOf()
+					}];
+
 					this.coll.insert(item, {
 						safe : true
 					}, function(err) {
@@ -196,6 +242,26 @@ var database = function() {
 				return def.promise;
 			};
 
+			var makeUpdate = function(db, itemId, modSet){				
+				var def = q.defer();
+				db.coll.update({
+					_id : new BSON.ObjectID(itemId.toString())
+				}, modSet, {
+					upsert : false,
+					safe : true
+				}, function(err, recordsUpdate) {
+					if (err) {
+						console.log(err);
+						def.reject(err);
+					} else {
+						getById.call(db, itemId).done(function(doc) {
+							def.resolve(doc);
+						});
+					}
+				});
+				return def.promise;
+			};
+			
 			return CollectionWithPromise;
 		}());
 	// var getCollection = function(collectionName){
@@ -232,7 +298,7 @@ var database = function() {
 		},
 		drop : function(collectionName) {
 			var def = q.defer();
-			
+
 			db.collection(collectionName, function(err, collection) {
 				return collection.remove({}, function(err, removed) {
 					def.resolve(removed);

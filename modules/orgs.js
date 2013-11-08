@@ -18,16 +18,16 @@ var mod = function() {
 		});
 	};
 
-	var create = function(name, firstAdminAccountId) {
+	var create = function(userId, name, firstAdminAccountId) {
 		var def = q.defer();
 		var orgToAdd = {
 			name : name,
 			admins : [firstAdminAccountId.toString()]
 		};
 		getCollection().then(function(col) {
-			col.add(orgToAdd).then(function(newOrg) {
-				accounts.addOrg(firstAdminAccountId, newOrg).then(function() {
-					def.resolve(newOrg);
+			col.add(userId, orgToAdd).then(function(newOrg) {
+				accounts.addOrg(userId, firstAdminAccountId, newOrg).then(function() {
+					 def.resolve(newOrg);
 				});
 			});
 		});
@@ -42,7 +42,7 @@ var mod = function() {
 		});
 	};
 
-	var addApplication = function(orgId, applicationsName) {
+	var addApplication = function(userId, orgId, applicationsName) {
 		return getCollection().then(function(col) {
 			return col.getById(orgId).then(function(org) {
 				var applications = org.applications || [];
@@ -51,14 +51,14 @@ var mod = function() {
 					name : applicationsName
 				});
 
-				return col.modify(orgId, {
+				return col.modify(userId, orgId, {
 					applications : applications
 				});
 			});
 		});
 	};
 
-	var addApplicationUser = function(orgId, appId, newUser) {
+	var addApplicationUser = function(userId, orgId, appId, newUser) {
 		return getCollection().then(function(col) {
 			return col.getById(orgId).then(function(org) {
 				var applications = org.applications || [];
@@ -77,14 +77,14 @@ var mod = function() {
 					}
 				});
 
-				return col.modify(orgId, {
+				return col.modify(userId, orgId, {
 					applications : applications
 				});
 			});
 		});
 	};
 
-	var modifyApplicationUser = function(orgId, appId, userId, mods) {
+	var modifyApplicationUser = function(userModifyingId, orgId, appId, userId, mods) {
 		return getCollection().then(function(col) {
 			return col.getById(orgId).then(function(org) {
 				var applications = _.map(org.applications || [], function(a) {
@@ -100,7 +100,7 @@ var mod = function() {
 					}
 					return a;
 				});
-				return col.modify(orgId, {
+				return col.modify(userModifyingId, orgId, {
 					applications : applications
 				});
 			});
