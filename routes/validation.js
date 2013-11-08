@@ -6,57 +6,8 @@ var _ = require("underscore");
 
 module.exports.init = function(app) {
 
-	var tempListOfValidators = [
-		{
-			code: 'numberGreaterThan',
-			name: 'Greater Than',
-			dataType: 'number'
-		},
-		{
-			code: 'numberLessThan',
-			name: 'Less Than',
-			dataType: 'number'
-		},
-		{
-			code: 'numberEqualTo',
-			name: 'Equals',
-			dataType: 'number'
-		},
-		{
-			code: 'textEqualTo',
-			name: 'Is',
-			dataType: 'text'
-		},
-		{
-			code: 'textStartsWith',
-			name: 'Starts With',
-			dataType: 'text'
-		},
-		{
-			code: 'textEndsWith',
-			name: 'Ends With',
-			dataType: 'text'
-		},
-		{
-			code: 'dateDayEquals',
-			name: 'On',
-			dataType: 'datetime'
-		},
-		{
-			code: 'dateAfter',
-			name: 'After',
-			dataType: 'datetime'
-		},
-		{
-			code: 'dateBefore',
-			name: 'Before',
-			dataType: 'datetime'
-		}		
-	];
-
 	app.get('/validatorTypes/:dataType', auth.restrict, function(req, res) {
-		feedModule.getAll().then(function(feeds) {
-			var validators = _.filter(tempListOfValidators, function(v){return v.dataType===req.params.dataType});
+		validationModule.getAll(req.params.dataType).then(function(validators) {
 			res.json(validators);
 		});
 	});
