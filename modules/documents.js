@@ -20,23 +20,21 @@ var mod = function() {
 		});
 	};
 
-	var modify = function(collectionId, documentId, changes) {
+	var modify = function(userId, collectionId, documentId, changes) {
 		return getCollection(collectionId).then(function(col) {
-			return col.modify(documentId, changes);
+			return col.modify(userId, documentId, changes);
 		});
 	};
 
-	var addData = function(collectionId, doc) {
+	var addData = function(userId, collectionId, doc) {
 		return getCollection(collectionId).then(function(col) {
-			return col.add(doc);
+			return col.add(userId, doc);
 		});
 	};
 
-	var archiveDocument = function(collectionId, documentId) {
+	var archiveDocument = function(userId, collectionId, documentId) {
 		return getCollection(collectionId).then(function(col) {
-			return col.modify(documentId, {
-				archived : true
-			});
+			return col.archive(userId, documentId);
 		});
 	};
 

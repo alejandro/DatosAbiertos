@@ -1,8 +1,11 @@
 "use strict";
 
 var database = require("../modules/database.js");
-var should = require('chai').should();
-var q = require("q");
+var chai = require('chai');
+var should = chai.should();
+var expect = chai.expect
+var q = require('q');
+var moment = require('moment');
 
 describe('Database', function() {
 
@@ -15,6 +18,8 @@ describe('Database', function() {
 	
 	describe('when retrieving collection data', function(){
 		
+		var userId = database.newId();
+	
 		var col = null;
 		var john = { Name: "John", Age: 56 };
 		var sam = { Name: "Sam", Age: 23 };
@@ -90,18 +95,23 @@ describe('Database', function() {
 		});
 		
 		it('should fail if user attempts to add an empty item', function(done){
-			col.add({}).fail(function(err){
+			col.add(userId, {}).fail(function(err){
 				err.should.equal('Cannot add an empty item.');
 			}).done(done);
 		});
 		
 		it('should be able to add an item', function(done){
-			col.add({Name:"David"}).then(function(createdItem){
+			var now = moment().valueOf();	
+			col.add(userId, {Name:"David"}).then(function(createdItem){
 				createdItem._id.should.not.be.null;
 				createdItem.Name.should.equal("David");
 				col.getById(createdItem._id).then(function(itemInDatabase){
 					itemInDatabase._id.toString().should.equal(createdItem._id.toString());
 					itemInDatabase.Name.should.equal(createdItem.Name);
+										
+					itemInDatabase.history[0].userId.toString().should.equal(userId.toString());
+					itemInDatabase.history[0].action.should.equal("created");
+					expect(itemInDatabase.history[0].time).to.be.at.least(now);					
 				}).done(done);
 			});
 		});
@@ -130,11 +140,52 @@ describe('Database', function() {
 			});
 		});
 		
-		it('should be able to modify an item by id', function(done){
-			col.modify(eva._id, {Name: "Eva Modified"}).then(function(modifiedItem){
+		it('should be able to archive an item by id', function(done){
+			var now = moment().valueOf();
+			col.archive(userId, eva._id).then(function(archivedItem){
 				col.getById(eva._id).then(function(itemInDatabase){
+					
+					itemInDatabase.archived.should.be.true;
+					
+					var history = itemInDatabase.history[itemInDatabase.history.length-1];
+					history.userId.toString().should.equal(userId.toString());
+					expect(history.time).to.be.at.least(now);
+					history.action.should.equal("archived");
+										
+				}).done(done);
+			});
+		});
+		
+		it('should be able to unarchive an item by id', function(done){
+			var now = moment().valueOf();
+			col.unarchive(userId, eva._id).then(function(archivedItem){
+				col.getById(eva._id).then(function(itemInDatabase){
+					
+					itemInDatabase.archived.should.be.false;
+					
+					var history = itemInDatabase.history[itemInDatabase.history.length-1];
+					history.userId.toString().should.equal(userId.toString());
+					expect(history.time).to.be.at.least(now);
+					history.action.should.equal("unarchived");
+										
+				}).done(done);
+			});
+		});
+		
+		it('should be able to modify an item by id', function(done){
+			var now = moment().valueOf();
+			var changes = {Name: "Eva Modified"};
+			col.modify(userId, eva._id, changes).then(function(modifiedItem){
+				col.getById(eva._id).then(function(itemInDatabase){
+					
 					itemInDatabase.Name.should.equal("Eva Modified");
 					itemInDatabase.Age.should.equal(eva.Age);
+					
+					var history = itemInDatabase.history[itemInDatabase.history.length-1];
+					history.userId.toString().should.equal(userId.toString());
+					history.time.should.equal(now);
+					history.action.should.equal("modified");
+					JSON.stringify(history.changes).should.equal(JSON.stringify(changes));
 				}).done(done);
 			});
 		});
@@ -149,13 +200,13 @@ describe('Database', function() {
 			
 			//add to fruits collection
 			database.collection("fruits").then(function(f_coll){
-				return f_coll.add(fruit);
+				return f_coll.add(userId, fruit);
 			
 			}).then(function(){
 					
 				//add to vehicles collection
 				return database.collection("vehicles").then(function(v_coll){					
-					return v_coll.add(vehicle);
+					return v_coll.add(userId, vehicle);
 				});
 				
 			}).then(function(){

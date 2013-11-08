@@ -8,6 +8,8 @@ var q = require("q");
 
 describe('Collections', function() {
 
+	var userId = database.newId();
+	
 	var feed1 = {
 		orgId: "orgId",
 		name : 'test1',
@@ -64,10 +66,10 @@ describe('Collections', function() {
 
 	beforeEach(function(done) {
 		database.collection("feeds").then(function(coll) {
-			coll.add(feed1).then(function() {
-				return coll.add(feed2);
+			coll.add(userId, feed1).then(function() {
+				return coll.add(userId, feed2);
 			}).then(function() {
-				return coll.add(feed3);
+				return coll.add(userId, feed3);
 			}).then(function(){
 				done();
 			}).fail(function(err) {

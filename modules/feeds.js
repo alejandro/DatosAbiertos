@@ -31,32 +31,30 @@ var mod = function() {
 		});
 	};
 
-	var archive = function(id) {
+	var archive = function(userId, id) {
 		return getCollection().then(function(col) {
-			return col.modify(id, {
-				archived : true
-			});
+			return col.archive(userId, id);
 		});
 	};
 
-	var create = function(name, orgId) {
+	var create = function(userId, name, orgId) {
 		return getCollection().then(function(col) {
-			return col.add({
+			return col.add(userId, {
 				name : name,
 				orgId : orgId.toString()
 			});
 		});
 	};
 
-	var correctName = function(id, correctedName) {
+	var correctName = function(userId, id, correctedName) {
 		return getCollection().then(function(col) {
-			return col.modify(id, {
+			return col.modify(userId, id, {
 				name : correctedName
 			});
 		});
 	};
 
-	var addCollection = function(feedId, collectionName) {
+	var addCollection = function(userId, feedId, collectionName) {
 
 		if (!collectionName) {
 			var def = q.defer();
@@ -72,14 +70,14 @@ var mod = function() {
 					name : collectionName
 				});
 
-				return col.modify(feedId, {
+				return col.modify(userId, feedId, {
 					collections : collections
 				});
 			});
 		});
 	};
 
-	var addField = function(feedId, collectionId, name, dataType) {
+	var addField = function(userId, feedId, collectionId, name, dataType) {
 		return getCollection().then(function(col) {
 			return col.getById(feedId).then(function(feed) {
 				var collections = _.map(feed.collections, function(c) {
@@ -97,14 +95,14 @@ var mod = function() {
 					return c;
 				});
 
-				return col.modify(feedId, {
+				return col.modify(userId, feedId, {
 					collections : collections
 				});
 			});
 		});
 	};
 
-	var modifyField = function(feedId, collectionId, fieldId, name, dataType) {
+	var modifyField = function(userId, feedId, collectionId, fieldId, name, dataType) {
 		return getCollection().then(function(col) {
 			return col.getById(feedId).then(function(feed) {
 
@@ -126,7 +124,7 @@ var mod = function() {
 					return c;
 				});
 
-				return col.modify(feedId, {
+				return col.modify(userId, feedId, {
 					collections : collections
 				});
 			});

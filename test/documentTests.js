@@ -4,9 +4,12 @@ var collectionDataModule = require("../modules/documents.js");
 var should = require('chai').should();
 var database = require("../modules/database.js");
 var q = require("q");
+var moment = require('moment');
 
 describe('Documents', function() {
 
+	var userId = database.newId();
+	
 	var collection = {
 		_id : database.newId(),
 		name : "test collection"
@@ -32,8 +35,8 @@ describe('Documents', function() {
 			};
 
 			database.collection(collection._id.toString()).then(function(c) {
-				c.add(testDocument).then(function(doc) {				
-					collectionDataModule.modify(collection._id, doc._id, changes).then(function(modifiedDocument) {
+				c.add(userId, testDocument).then(function(doc) {				
+					collectionDataModule.modify(userId, collection._id, doc._id, changes).then(function(modifiedDocument) {
 						modifiedDocument.name.should.equal(changes.name);
 						modifiedDocument.color.should.equal(changes.color);
 					}).done(done);
@@ -55,8 +58,8 @@ describe('Documents', function() {
 			};
 
 			database.collection(collection._id.toString()).then(function(c) {
-				c.add(testDocument).then(function(doc) {
-					collectionDataModule.archiveDocument(collection._id, doc._id).then(function(archivedDoc) {
+				c.add(userId, testDocument).then(function(doc) {
+					collectionDataModule.archiveDocument(userId, collection._id, doc._id).then(function(archivedDoc) {
 						archivedDoc.archived.should.equal(true);
 					}).done(done);
 				});
@@ -64,10 +67,11 @@ describe('Documents', function() {
 		});
 	});
 
-	describe('when adding data to a collection', function() {
-		it('should add the object to the database', function(done) {
-			var now = new Date();
-			collectionDataModule.addData(collection._id, {
+	describe('when adding a document to a collection', function() {
+		it('should add the doc to the database', function(done) {
+			var now = moment().valueOf();
+			var userId = database.newId();
+			collectionDataModule.addData(userId, collection._id, {
 				name : "Toyota Tacoma",
 				color : "red",
 				cost : 10000,
@@ -77,14 +81,14 @@ describe('Documents', function() {
 				newData.color.should.equal("red");
 				newData.cost.should.equal(10000);
 				newData.paidOn.toString().should.equal(now.toString());
-				newData._id.should.not.be.null;
+				newData._id.should.not.be.null;							
 			}).done(done);
 		});
 	});
 
 	describe('when attempting to add empty data to a collection', function() {
 		it('should raise the expected error', function(done) {
-			collectionDataModule.addData(collection._id, {}).fail(function(err) {
+			collectionDataModule.addData(userId, collection._id, {}).fail(function(err) {
 				err.should.equal('Cannot add an empty item.');
 			}).done(done);
 		});
@@ -96,7 +100,7 @@ describe('Documents', function() {
 			var now = new Date();
 
 			database.collection(collection._id.toString()).then(function(c) {
-				c.add({
+				c.add(userId, {
 					name : "test",
 					color : "red",
 					cost : 5,
@@ -104,7 +108,7 @@ describe('Documents', function() {
 				});
 				return c;
 			}).then(function(c) {
-				c.add({
+				c.add(userId, {
 					name : "test2",
 					archived : true
 				})
@@ -129,7 +133,7 @@ describe('Documents', function() {
 			var now = new Date();
 
 			database.collection(collection._id.toString()).then(function(c) {
-				c.add({
+				c.add(userId, {
 					name : "test2",
 					color : "red",
 					cost : 5,
@@ -137,7 +141,7 @@ describe('Documents', function() {
 				});
 				return c;
 			}).then(function(c) {
-				c.add({
+				c.add(userId, {
 					name : "test1",
 					color : "blueberry",
 					cost : 10,
@@ -145,7 +149,7 @@ describe('Documents', function() {
 				});
 				return c;
 			}).then(function(c) {
-				c.add({
+				c.add(userId, {
 					name : "test3",
 					cost : 10,
 					paidOn : now
