@@ -1,6 +1,7 @@
 'use strict';
 
 var validationModule = require('../modules/validation');
+var documentModule = require('../modules/documents');
 var auth = require('../auth');
 var _ = require("underscore");
 
@@ -11,21 +12,19 @@ module.exports.init = function(app) {
 			res.json(validators);
 		});
 	});
-// 
-	// app.get('/feeds/:id', auth.restrict, function(req, res) {
-		// feedModule.get(req.params.id).then(function(feed) {
-			// res.json(feed);
-		// });
-	// });
-// 
-	// app.post('/feeds/:feedId/collections', function(req, res) {
-		// feedModule.addCollection(req.params.feedId, req.body.name).then(function() {
-			// res.json({
-				// status : 'ok'
-			// });
-		// });
-	// });
-// 
+
+	app.post('/feeds/:feedId/collections/:collectionId/prevalidation', auth.restrict, function(req, res) {
+		documentModule.validateNewDocument(req.params.feedId, req.params.collectionId, req.body).then(function(result) {
+			res.json(result);
+		});
+	});
+
+	app.put('/feeds/:feedId/collections/:collectionId/prevalidation', auth.restrict, function(req, res) {
+		documentModule.validateModifications(req.params.feedId, req.params.collectionId, req.body).then(function(result) {
+			res.json(result);
+		});
+	});
+
 	app.post('/feeds/:feedId/collections/:collectionId/rules', function(req, res) {
 		validationModule.addRule(req.params.feedId, req.params.collectionId, req.body.validatorType, req.body.value).then(function() {
 			res.json({
