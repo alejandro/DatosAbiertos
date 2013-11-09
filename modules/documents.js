@@ -1,6 +1,7 @@
 'use strict';
 
 var database = require('../modules/database.js');
+var validation = require('../modules/validation.js');
 var _ = require('underscore');
 
 var mod = function() {
@@ -38,11 +39,26 @@ var mod = function() {
 		});
 	};
 
+	var validateModifications = function(feedId, collectionId, documentId, modifications){
+		return getCollection(collectionId).then(function(col) {
+			return col.getById(documentId).then(function(doc){
+				var modifiedDoc = _.extend(doc, modifications);
+				return validation.validateDocument(feedId, collectionId, modifiedDoc);
+			});
+		});
+	};
+	
+	var validateNewDocument = function(feedId, collectionId, newDocument){
+		return validation.validateDocument(feedId, collectionId, newDocument);
+	};
+	
 	return {
 		getAll : getAll,
 		addData : addData,
 		archiveDocument : archiveDocument,
-		modify : modify
+		modify : modify,
+		validateModifications: validateModifications,
+		validateNewDocument: validateNewDocument
 	};
 }();
 

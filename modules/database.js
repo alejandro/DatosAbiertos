@@ -87,7 +87,7 @@ var database = function() {
 			CollectionWithPromise.prototype.modify = function(userId, id, modification) {
 				var self = this;
 				delete modification._id;
-
+				
 				var modSet = {
 					$set : modification,
 					$push : {
@@ -242,7 +242,7 @@ var database = function() {
 				return def.promise;
 			};
 
-			var makeUpdate = function(db, itemId, modSet){				
+			var makeUpdate = function(db, itemId, modSet){		
 				var def = q.defer();
 				db.coll.update({
 					_id : new BSON.ObjectID(itemId.toString())
@@ -252,7 +252,7 @@ var database = function() {
 				}, function(err, recordsUpdate) {
 					if (err) {
 						console.log(err);
-						def.reject(err);
+						def.reject(err);						
 					} else {
 						getById.call(db, itemId).done(function(doc) {
 							def.resolve(doc);
