@@ -1,10 +1,10 @@
-define(['feedBrowser/feedData', 'durandal/app'], function(feedData, app) {
+define(['feedBrowser/feedData', 'durandal/app', 'feedBrowser/validation'], function(feedData, app, validation) {
 
 	var viewModel = function(api) {
 
 		var feedId = ko.observable();
 		var collectionId = ko.observable();
-
+		var validationErrors = ko.observableArray([]);
 		var collectionName = ko.observable();
 		var fields = ko.observableArray([]);
 
@@ -16,7 +16,12 @@ define(['feedBrowser/feedData', 'durandal/app'], function(feedData, app) {
 			_.each(fields(), function(field) {
 				dataObject[field.name] = field.value;
 			});
-			closeModal(dataObject);
+			validation.preValidateNewDocument(feedId(), collectionId(), dataObject).then(function(results) {
+				if (results.length == 0)
+					closeModal(dataObject);
+				else
+					validationErrors(results);
+			});
 		};
 
 		var loadCollection = function() {
@@ -45,6 +50,7 @@ define(['feedBrowser/feedData', 'durandal/app'], function(feedData, app) {
 			collectionName : collectionName,
 			fields : fields,
 			add : add,
+			validationErrors: validationErrors,
 			activate : function(args) {
 				var self = this;
 				feedId(args.feedId);

@@ -87,7 +87,7 @@ var database = function() {
 			CollectionWithPromise.prototype.modify = function(userId, id, modification) {
 				var self = this;
 				delete modification._id;
-				
+
 				var modSet = {
 					$set : modification,
 					$push : {
@@ -100,43 +100,47 @@ var database = function() {
 					}
 				};
 
-				return makeUpdate(self, id, modSet);				
+				return makeUpdate(self, id, modSet);
 			};
 
 			CollectionWithPromise.prototype.archive = function(userId, itemId) {
 				var self = this;
-				
+
 				var modSet = {
-					$set : { archived : true},
+					$set : {
+						archived : true
+					},
 					$push : {
 						history : {
 							userId : userId,
 							action : "archived",
-							time : moment().valueOf()							
+							time : moment().valueOf()
 						}
-					}			
+					}
 				};
 
-				return makeUpdate(self, itemId, modSet);				
+				return makeUpdate(self, itemId, modSet);
 			};
-			
+
 			CollectionWithPromise.prototype.unarchive = function(userId, itemId) {
 				var self = this;
-				
+
 				var modSet = {
-					$set : { archived : false},
+					$set : {
+						archived : false
+					},
 					$push : {
 						history : {
 							userId : userId,
 							action : "unarchived",
-							time : moment().valueOf()							
+							time : moment().valueOf()
 						}
-					}			
+					}
 				};
 
-				return makeUpdate(self, itemId, modSet);				
+				return makeUpdate(self, itemId, modSet);
 			};
-			
+
 			CollectionWithPromise.prototype.remove = function(idOrQuery) {
 				var def = q.defer();
 				var query = idOrQuery;
@@ -171,11 +175,9 @@ var database = function() {
 				var def = q.defer();
 				if ( typeof item === null) {
 					def.reject('item is null');
-				}
-				if ( typeof item === 'undefined') {
+				} else if ( typeof item === 'undefined') {
 					def.reject('item is undefined');
-				}
-				if ( typeof item !== 'object') {
+				} else if ( typeof item !== 'object') {
 					def.reject(JSON.stringify(item) + ' is not an object');
 				} else if (Object.keys(item).length == 0) {
 					def.reject('Cannot add an empty item.')
@@ -242,7 +244,7 @@ var database = function() {
 				return def.promise;
 			};
 
-			var makeUpdate = function(db, itemId, modSet){		
+			var makeUpdate = function(db, itemId, modSet) {
 				var def = q.defer();
 				db.coll.update({
 					_id : new BSON.ObjectID(itemId.toString())
@@ -252,7 +254,7 @@ var database = function() {
 				}, function(err, recordsUpdate) {
 					if (err) {
 						console.log(err);
-						def.reject(err);						
+						def.reject(err);
 					} else {
 						getById.call(db, itemId).done(function(doc) {
 							def.resolve(doc);
@@ -261,7 +263,7 @@ var database = function() {
 				});
 				return def.promise;
 			};
-			
+
 			return CollectionWithPromise;
 		}());
 	// var getCollection = function(collectionName){

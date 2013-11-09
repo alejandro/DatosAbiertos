@@ -13,14 +13,14 @@ module.exports.init = function(app) {
 		});
 	});
 
-	app.post('/feeds/:feedId/collections/:collectionId/prevalidation', auth.restrict, function(req, res) {
+	app.post('/validation/feeds/:feedId/collections/:collectionId', function(req, res) {
 		documentModule.validateNewDocument(req.params.feedId, req.params.collectionId, req.body).then(function(result) {
 			res.json(result);
 		});
 	});
 
-	app.put('/feeds/:feedId/collections/:collectionId/prevalidation', auth.restrict, function(req, res) {
-		documentModule.validateModifications(req.params.feedId, req.params.collectionId, req.body).then(function(result) {
+	app.put('/validation/feeds/:feedId/collections/:collectionId/documents/:documentId', function(req, res) {
+		documentModule.validateModifications(req.params.feedId, req.params.collectionId, req.params.documentId, req.body).then(function(result) {
 			res.json(result);
 		});
 	});
@@ -33,7 +33,9 @@ module.exports.init = function(app) {
 		});
 	});
 
-	app.delete('/feeds/:feedId/collections/:collectionId/rules/:ruleId', function(req, res) {
+	app.
+	delete ('/feeds/:feedId/collections/:collectionId/rules/:ruleId',
+	function(req, res) {
 		feedModule.removeRule(req.params.feedId, req.params.collectionId, req.params.ruleId).then(function() {
 			res.json({
 				status : 'ok'

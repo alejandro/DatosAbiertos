@@ -24,7 +24,7 @@ module.exports.init = function(app) {
 	});
 
 	app.post('/orgs/:orgId/feeds', auth.restrict, function(req, res) {
-		feedModule.create(req.body.name, req.params.orgId).done(function() {
+		feedModule.create(req.user._id, req.body.name, req.params.orgId).done(function() {
 			res.json({
 				status : 'ok'
 			});
@@ -39,7 +39,7 @@ module.exports.init = function(app) {
 
 	app.post('/orgs', auth.restrict, function(req, res) {
 		accountModule.getByEmail(req.user.email).then(function(account) {
-			orgModule.create(req.body.name, account._id).done(function() {
+			orgModule.create(req.user._id, req.body.name, account._id).done(function() {
 				res.json({
 					status : 'ok'
 				});
@@ -48,7 +48,7 @@ module.exports.init = function(app) {
 	});
 
 	app.post('/orgs/:orgId/applications', function(req, res) {
-		orgModule.addApplication(req.params.orgId, req.body.name).then(function() {
+		orgModule.addApplication(req.user._id, req.params.orgId, req.body.name).then(function() {
 			res.json({
 				status : 'ok'
 			});
@@ -56,7 +56,7 @@ module.exports.init = function(app) {
 	});
 
 	app.post('/orgs/:orgId/applications/:appId/users', function(req, res) {
-		orgModule.addApplicationUser(req.params.orgId, req.params.appId, req.body).then(function() {
+		orgModule.addApplicationUser(req.user._id, req.params.orgId, req.params.appId, req.body).then(function() {
 			res.json({
 				status : 'ok'
 			});
@@ -64,7 +64,7 @@ module.exports.init = function(app) {
 	});
 
 	app.put('/orgs/:orgId/applications/:appId/users/:userId', function(req, res) {
-		orgModule.modifyApplicationUser(req.params.orgId, req.params.appId, req.params.userId, req.body).then(function() {
+		orgModule.modifyApplicationUser(req.user._id, req.params.orgId, req.params.appId, req.params.userId, req.body).then(function() {
 			res.json({
 				status : 'ok'
 			});

@@ -16,7 +16,7 @@ define(['feedBrowser/feedData', 'durandal/app'], function(feedData, app) {
 			name : selectedValidatorType().name,
 			code : selectedValidatorType().code,
 			value : selectedValidatorValue()
-		};
+		};		
 		rules.push(newRule);
 		selectedValidatorValue("");		
 	};
@@ -50,7 +50,7 @@ define(['feedBrowser/feedData', 'durandal/app'], function(feedData, app) {
 			name(field.name);
 			selectedDataType(field.dataType);
 			loadValidatorTypes(field.dataType);
-			rules(field.rules);
+			rules(field.rules||[]);
 		});
 	};
 

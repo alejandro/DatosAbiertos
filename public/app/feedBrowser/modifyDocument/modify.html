@@ -14,6 +14,9 @@
         	</table>        	
         </form>
     </div>
+    <ul data-bind="foreach: validationErrors">
+    	<li><span data-bind="html: field"></span> <span data-bind="html: message"></span></li>
+    </ul>
     <div class="modal-footer">
         <button class="btn btn-primary" data-bind="click: modify">Modify</button>
     </div>

@@ -13,27 +13,28 @@ module.exports.init = function(app) {
 		var query;
 		if (queryObj.query)
 			query = JSON.parse(queryObj.query);
-		//need json validation here to return a helpful message in case the json is malformed.
 		dataModule.getAll(req.params.collectionId, query).then(function(documents) {
 			res.json(documents);
 		});
 	});
 
 	app.post('/collections/:collectionId/documents', auth.restrict, function(req, res) {
-		dataModule.addData(req.params.collectionId, req.body).then(function() {
+		//need json validation here to return a helpful message in case the json is malformed.
+		dataModule.addData(req.user._id, req.params.collectionId, req.body).then(function() {
 			res.json({
 				status : 'ok'
 			});
-		}).fail(function(err) {
+		}).fail(function(err) {			
 			res.json({
-				error : err
+				error : err,
+				dataReceived: req.body
 			}, 405);
 		});
 	});
 
 	app.delete ('/collections/:collectionId/documents/:documentId', auth.restrict,
 	function(req, res) {
-		dataModule.archiveDocument(req.params.collectionId, req.params.documentId).then(function() {
+		dataModule.archiveDocument(req.user._id, req.params.collectionId, req.params.documentId).then(function() {
 			res.json({
 				status : 'ok'
 			});
@@ -41,7 +42,7 @@ module.exports.init = function(app) {
 	});
 
 	app.put('/collections/:collectionId/documents/:documentId', auth.restrict, function(req, res) {
-		dataModule.modify(req.params['collectionId'], req.params['documentId'], req.body).then(function() {
+		dataModule.modify(req.user._id, req.params.collectionId, req.params.documentId, req.body).then(function() {
 			res.json({
 				status : 'ok'
 			});
