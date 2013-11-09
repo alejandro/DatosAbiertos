@@ -1,7 +1,9 @@
 "use strict";
 
 var collectionDataModule = require("../modules/documents.js");
-var should = require('chai').should();
+var chai = require('chai');
+chai.Assertion.includeStack = true;
+var should = chai.should();
 var database = require("../modules/database.js");
 var q = require("q");
 var moment = require('moment');

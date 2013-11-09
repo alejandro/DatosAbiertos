@@ -25,8 +25,8 @@ module.exports.init = function(app) {
 		});
 	});
 
-	app.post('/feeds/:feedId/collections/:collectionId/fields', function(req, res) {
-		feedModule.addField(req.params.feedId, req.params.collectionId, req.body.name, req.body.dataType, req.body.rules).then(function() {
+	app.post('/feeds/:feedId/collections/:collectionId/fields', function(req, res) {		
+		feedModule.addField(req.user._id, req.params.feedId, req.params.collectionId, req.body.name, req.body.dataType, req.body.rules).then(function() {
 			res.json({
 				status : 'ok'
 			});
@@ -34,7 +34,7 @@ module.exports.init = function(app) {
 	});
 
 	app.put('/feeds/:feedId/collections/:collectionId/fields/:fieldId', function(req, res) {
-		feedModule.modifyField(req.params.feedId, req.params.collectionId, req.params.fieldId, req.body.name, req.body.dataType, req.body.rules).then(function() {
+		feedModule.modifyField(req.user._id, req.params.feedId, req.params.collectionId, req.params.fieldId, req.body.name, req.body.dataType, req.body.rules).then(function() {
 			res.json({
 				status : 'ok'
 			});
