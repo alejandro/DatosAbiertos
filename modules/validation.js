@@ -110,30 +110,26 @@ var mod = function() {
 	var validateDocument = function(feedId, collectionId, doc) {
 		var def = q.defer();
 		getCollection().then(function(coll) {
-			coll.getById(feedId).then(function(feed) {
-		
-				var collection = _.find(feed.collections, function(c) {
-					return c._id.toString() == collectionId.toString();
-				});
-
-				var results = [];
-
-				_.each(collection.fields, function(field) {
-
-					_.each(field.rules, function(rule) {
-
-						if (!fieldIsValid(rule.code, rule.value, doc[field.name]||"")) {
-							var validationResult = {
-								field : field.name,
-								message : rule.message || DEFAULT_MESSAGE
-							};
-							results.push(validationResult);
-						}
-					});
-				});
-				def.resolve(results);
-
+			return coll.getById(feedId)
+		}).then(function(feed) {
+			var collection = _.find(feed.collections, function(c) {
+				return c._id.toString() == collectionId.toString();
 			});
+
+			var results = [];
+
+			_.each(collection.fields, function(field) {
+				_.each(field.rules, function(rule) {
+					if (!fieldIsValid(rule.code, rule.value, doc[field.name] || "")) {
+						var validationResult = {
+							field : field.name,
+							message : rule.message || DEFAULT_MESSAGE
+						};
+						results.push(validationResult);
+					}
+				});
+			});
+			def.resolve(results);
 		});
 		return def.promise;
 	};

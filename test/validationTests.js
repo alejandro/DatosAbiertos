@@ -47,7 +47,7 @@ describe('Validation', function() {
 
 	beforeEach(function(done) {
 		var deleteAll = function(collectionName, callback) {
-			database.currentConnection().collection(collectionName, function(err, coll) {
+			database.currentConnection.collection(collectionName, function(err, coll) {
 				coll.remove({}, callback);
 			});
 		}

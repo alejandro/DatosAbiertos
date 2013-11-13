@@ -53,7 +53,7 @@ describe('Orgs', function() {
 	beforeEach(function(done) {
 
 		var deleteAll = function(collectionName, callback) {
-			return database.currentConnection().collection(collectionName, function(err, coll) {
+			return database.currentConnection.collection(collectionName, function(err, coll) {
 				coll.remove({}, callback);
 			});
 		};

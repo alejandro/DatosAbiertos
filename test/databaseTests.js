@@ -12,7 +12,7 @@ describe('Database', function() {
 	describe('when connecting to the database', function() {
 		it('should connect successfully', function() {			
 			database.isConnected().should.be.true;	
-			database.currentConnection.should.be.a('function');																	
+			database.currentConnection.should.be.a('object');																	
 		});
 	});
 	
@@ -29,14 +29,14 @@ describe('Database', function() {
 			database.collection("test").then(function(c){ 
 				col = c;						
 								
-				database.currentConnection().collection("test", function(err, coll) {
+				database.currentConnection.collection("test", function(err, coll) {
 					coll.insert([john, sam, eva ],{ safe: true}, done);
 				});
 			});	
 		});
 		
 		afterEach(function(done){
-			database.currentConnection().collection("test", function(err, coll) {
+			database.currentConnection.collection("test", function(err, coll) {
 					coll.remove({},{ safe: true}, done);
 				});
 		});
@@ -211,7 +211,7 @@ describe('Database', function() {
 				
 			}).then(function(){
 				var def = q.defer();	
-				database.currentConnection().collection("vehicles", function(err, coll) {			
+				database.currentConnection.collection("vehicles", function(err, coll) {			
 					coll.findOne({ '_id' : vehicle._id }, function(err, doc) {
 							doc.type.should.equal(vehicle.type);
 							def.resolve();
@@ -221,7 +221,7 @@ describe('Database', function() {
 			
 			}).then(function(){
 				var def = q.defer();	
-				database.currentConnection().collection("fruits", function(err, coll) {			
+				database.currentConnection.collection("fruits", function(err, coll) {			
 					coll.findOne({ '_id' : fruit._id }, function(err, doc) {
 							doc.name.should.equal(fruit.name);
 							def.resolve();

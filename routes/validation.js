@@ -33,9 +33,7 @@ module.exports.init = function(app) {
 		});
 	});
 
-	app.
-	delete ('/feeds/:feedId/collections/:collectionId/rules/:ruleId',
-	function(req, res) {
+	app.delete ('/feeds/:feedId/collections/:collectionId/rules/:ruleId', function(req, res) {
 		feedModule.removeRule(req.params.feedId, req.params.collectionId, req.params.ruleId).then(function() {
 			res.json({
 				status : 'ok'

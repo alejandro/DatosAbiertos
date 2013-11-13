@@ -30,7 +30,7 @@ describe('Accounts', function() {
 	});
 
 	afterEach(function(done) {
-		database.currentConnection().collection("accounts", function(err, coll) {
+		database.currentConnection.collection("accounts", function(err, coll) {
 			coll.remove({}, {
 				safe : true
 			}, done);
