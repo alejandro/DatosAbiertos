@@ -11,11 +11,18 @@ module.exports.init = function(app) {
 		var theUrl = url.parse(req.url);
 		var queryObj = queryString.parse(theUrl.query);
 		var query;
-		if (queryObj.query)
-			query = JSON.parse(queryObj.query);
-		dataModule.getAll(req.params.collectionId, query).then(function(documents) {
-			res.json(documents);
-		});
+		try{
+			if (queryObj.query)
+				query = JSON.parse(queryObj.query);
+			console.log(query);
+		
+			dataModule.getAll(req.params.collectionId, query).then(function(documents) {
+				res.json(documents);
+			});
+		}
+		catch(err){
+			res.json({querystring: theUrl.query, querystringConvertedToJson: queryObj, message: 'The query json object could not be parsed. ', error: err}, 500);
+		}
 	});
 
 	app.post('/collections/:collectionId/documents', auth.restrict, function(req, res) {

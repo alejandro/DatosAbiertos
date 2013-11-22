@@ -8,7 +8,7 @@ var _ = require('underscore');
 
 module.exports.init = function(app) {
 
-	app.get('/orgs', auth.restrictRole('admin'), function(req, res) {
+	app.get('/orgs', auth.restrict, function(req, res) {
 		accountModule.getByEmail(req.user.email).then(function(account) {
 			orgModule.getAllForAccount(account._id).then(function(orgs) {
 				res.json(orgs);

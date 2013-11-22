@@ -3,7 +3,8 @@
 <h3>Administrators</h3>
 <ul data-bind="foreach: admins">
 	<li>
-		<span data-bind="html: displayName"></span> <a href="#" data-bind="click: $parent.removeAdmin">Remove</a>
+		<span data-bind="html: displayName"></span> 
+		<a href="#" data-bind="visible: canRemove, click: $parent.removeAdmin">Remove</a>
 	</li>
 </ul>
 

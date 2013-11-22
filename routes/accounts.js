@@ -21,6 +21,10 @@ module.exports.init = function(app) {
 		})
 	});
 	
+	app.get('/accounts/me', auth.restrict, function(req, res){
+		res.json(req.user);
+	});
+	
 	app.get('/api/auth', auth.authenticateWithUserAndToken, function(req, res){
 		res.json(req.user);	
 	});

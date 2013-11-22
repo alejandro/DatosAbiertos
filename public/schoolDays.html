@@ -5,72 +5,89 @@
 	<body>
 		<h1>ASJ: School Days</h1>
 
-		<p>
-			This single page app will present a form and will post the contents to the Datos Abiertos repository. Then it will display a thank you message.
-		</p>
+		<div id='loginFailed' style="display: none">
+			Your login failed. Please try again.
+		</div>
 
-		<table id='form'>
-			<tr>
-				<th>Date</th>
-				<td><span id='today'></span></td>
-			</tr>
-			<tr>
-				<th>School</th>
-				<td>
-				<select id='schools'/>
-				</td>
-			</tr>
-			<tr>
-				<th>Open</th>
-				<td><label for='open_yes'>Yes</label>
-				<input type='radio' name='open' id='open_yes' value="yes" />
-				<label for='open_no'>No</label>
-				<input type='radio' name='open' id='open_no' value="no" />
-				</td>
-			</tr>
-			<tr>
-				<th></th>
-				<td>
-				<button id='send'>
-					Send
-				</button></td>
-			</tr>
-		</table>
+		<div id='schoolAlreadyReportedToday' style="display: none">
+			That school has already reported today.
+		</div>
 
-		<div id='thanks' style='display: none;'>
-			<h3>Thank you!</h3>
+		<div id='sorryNoSchools' style="display: none">
+			Sorry. You don't have any schools assigned to your account. Please see the program administrator.
+		</div>
+
+		<div id='dataEntry' style="display: none">
 			<p>
-				The data has been submitted to the server.
+
 			</p>
+
+			<table id='form'>
+				<tr>
+					<th>Date</th>
+					<td><span id='today'></span></td>
+				</tr>
+				<tr id='multipleSchools' style="display: none">
+					<th>School</th>
+					<td>
+					<select id='schools'/>
+					</td>
+				</tr>
+				<tr id='singleSchool' style="display: none">
+					<th>School</th>
+					<td><span id='school'/></td>
+				</tr>
+				<tr>
+					<th>Open</th>
+					<td><label for='open_yes'>Yes</label>
+					<input type='radio' name='open' id='open_yes' value="yes" />
+					<label for='open_no'>No</label>
+					<input type='radio' name='open' id='open_no' value="no" />
+					</td>
+				</tr>
+				<tr>
+					<th></th>
+					<td>
+					<button id='send'>
+						Send
+					</button></td>
+				</tr>
+			</table>
+
+			<div id='thanks' style='display: none;'>
+				<h3>Thank you!</h3>
+				<p>
+					The data has been submitted to the server.
+				</p>
+			</div>
+
 		</div>
 
 		<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
 		<script type='text/javascript'>
 			$(document).ready(function() {
-				
+
 				var apiBaseUrl = "http://" + location.host + "/";
-				var schoolsCollectionId = "525975a7d709f67801000003";
+				var schoolsCollectionId = "528fbdf1a5901f7d3a000005";
+				var schoolDays = "528fbe4fa5901f7d3a00000a";
+				var token = "528fbdaba5901f7d3a000001";
 
-				var schoolDays = "5259762dd709f6780100000b";
-				var token = "5262a1ca689515c720000004";
-				var username = 'test';
-				var password = 'testpass123';
-
-				var login = function(username, password, token) {
+				var login = function(token) {
 					return $.ajax({
 						type : "GET",
 						cache : false,
-						url : apiBaseUrl + 'api/auth?token=' + token,
-						username : username,
-						password : password
+						url : apiBaseUrl + 'api/auth?token=' + token
+					}).fail(function() {
+						$("#loginFailed").show();
 					});
 				};
 
-				login(username, password, token).then(function(user) {
+				login(token).then(function(user) {
 
-					console.log(user);
+					$("#dataEntry").show();
 
 					var date = new Date();
+					var schoolId;
 
 					$("#today").html(date);
 
@@ -79,23 +96,60 @@
 						$where : "(this.Workers||'').indexOf('" + user.username + "')>-1"
 					};
 					$.get(apiBaseUrl + 'collections/' + schoolsCollectionId + '/documents' + '?query=' + JSON.stringify(query)).then(function(schools) {
-						if (schools.length == 0) {
-							alert("No schools found for " + user.username + "!");
+
+						if (schools.length === 0) {
+							$("#dataEntry").hide();
+							$("#sorryNoSchools").show();
+						} else if (schools.length === 1) {
+							$("#singleSchool").show();
+							schoolId = schools[0]._id;
+							$("#school").html(schools[0].Name);
+						} else {
+							$("#multipleSchools").show();
+							var schoolOptions = $("#schools");
+							$.each(schools, function() {
+								schoolOptions.append($("<option />").val(this._id).text(this.Name));
+							});
 						}
-						var schoolOptions = $("#schools");
-						console.log(schools.length);
-						$.each(schools, function() {
-							schoolOptions.append($("<option />").val(this._id).text(this.Name));
-						});
+
 					});
 
 					$("#send").click(function() {
 
+						var isOpen = $("input:radio[name='open']:checked").val() == "yes";
+						var isClosed = $("input:radio[name='open']:checked").val() == "no";
+						if (!isOpen && !isClosed) {
+							alert("Please select whether or not this school is open or closed.");
+							return;
+						}
+
+						schoolId = schoolId || $("#schools").val();
 						var shortDate = (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
+
+						var query = {
+							$where : encodeURIComponent("this['School Id']==='" + schoolId + "' && this.Date==='" + shortDate + "'")
+						};
+
+						$.get(apiBaseUrl + 'collections/' + schoolDays + '/documents' + '?query=' + JSON.stringify(query)).then(function(days) {
+							if (days.length === 0) {
+								sendDayReport(schoolId, shortDate, isOpen, user.username);
+							} else {
+								$("#schoolAlreadyReportedToday").show();
+								$("#dataEntry").hide();
+							}
+
+						});
+
+					});
+
+					function sendDayReport(schoolId, date, isOpen, worker) {
+
 						var objToSend = {
-							'School Id' : $("#schools").val(),
-							'Date' : shortDate,
-							'Open' : $("input:radio[name='open']:checked").val()
+							'School Id' : schoolId,
+							'Date' : date,
+							'Open' : isOpen,
+							'Worker': worker,
+							'ReportedAt': new Date()
 						};
 
 						$.post(apiBaseUrl + 'collections/' + schoolDays + '/documents', objToSend).then(function() {
@@ -103,9 +157,9 @@
 							$("#thanks").show();
 						});
 
-					});
-				});
+					}
 
+				});
 			});
 		</script>
 	</body>
