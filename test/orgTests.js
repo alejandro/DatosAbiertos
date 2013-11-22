@@ -10,9 +10,11 @@ var q = require("q");
 describe('Orgs', function() {
 
 	var userId = database.newId();
-	
+
 	var org1 = {
+		_id : database.newId(),
 		name : "Police",
+		admins: [],
 		applications : [{
 			name : 'Web App',
 			_id : database.newId(),
@@ -24,6 +26,7 @@ describe('Orgs', function() {
 		}]
 	};
 	var org2 = {
+		_id : database.newId(),
 		name : "Firemen",
 		applications : [{
 			name : 'Android App',
@@ -38,6 +41,7 @@ describe('Orgs', function() {
 		}]
 	};
 	var org3 = {
+		_id : database.newId(),
 		name : "Healthcare",
 		applications : [{
 			name : 'iPhone App',
@@ -50,37 +54,44 @@ describe('Orgs', function() {
 		orgs : [1, 2, 3]
 	};
 
+	var account2 = {
+		email : "colin@acklenavenue.com",
+		orgs : []
+	};
+
 	beforeEach(function(done) {
 
 		var deleteAll = function(collectionName, callback) {
-			return database.currentConnection().collection(collectionName, function(err, coll) {
-				coll.remove({}, callback);
-			});
-		};
-		
-		var createTestData = function() {
-			return database.collection("accounts").then(function(accountsColl) {
-				return accountsColl.add(userId, account1);
-			}).then(function() {
-				return database.collection("orgs").then(function(orgsColl) {
-					return orgsColl.add(userId, org1);
-				});
-			}).then(function() {
-				return database.collection("orgs").then(function(orgsColl) {
-					return orgsColl.add(userId, org2);
-				});
-			}).then(function() {
-				return database.collection("orgs").then(function(orgsColl) {
-					return orgsColl.add(userId, org3);
+			database.currentConnection().collection(collectionName, function(err, coll) {
+				coll.remove({}, function() {
+					callback();
 				});
 			});
 		};
 
-		deleteAll("orgs", deleteAll("accounts", function() {
-			createTestData().done(function() {
-				done();
+		var createTestData = function(callback) {
+			database.collection("accounts").then(function(accountsColl) {
+				return accountsColl.add(userId, account1).then(function() {
+					return accountsColl.add(userId, account2);
+				});
+			}).then(function() {
+				database.collection("orgs").then(function(orgsColl) {
+					orgsColl.add(userId, org1).then(orgsColl.add(userId, org2)).then(orgsColl.add(userId, org3)).done(function() {
+						org1.admins.push(account1._id);
+						org1.admins.push(account2._id);
+						callback();
+					});
+				});
 			});
-		}));
+		};
+
+		deleteAll("orgs", function() {
+			deleteAll("accounts", function() {
+				createTestData(function() {
+					done();
+				});
+			});
+		});
 	});
 
 	describe('when getting an org by id', function() {
@@ -88,6 +99,31 @@ describe('Orgs', function() {
 			orgModule.getById(org1._id).then(function(org) {
 				org.name.should.equal(org1.name);
 			}).done(done);
+		});
+	});
+
+	describe('when removing an admin from an org', function() {
+		it('should remove the admin', function(done) {
+			orgModule.removeAdminUser(userId, org1._id, account1._id).then(function(org) {
+				org.admins.should.not.include(account1._id);
+			}).done(done);
+		});
+	});
+
+	describe('when adding an org admin user', function() {
+		it('should add the user to the list of admins', function(done) {
+			var userIdToAdd = account2._id;			
+			orgModule.addAdminUser(userId, org2._id, userIdToAdd).then(function(existingOrg) {
+				database.collection("orgs").then(function(col) {
+					col.getById(existingOrg._id).then(function(orgInDatabase) {
+						orgInDatabase.admins[0].toString().should.equal(userIdToAdd.toString());
+					}).then(database.collection("accounts").then(function(col) {
+						col.getById(account2._id).then(function(accountInDatabase) {
+							accountInDatabase.orgs.should.include(org2._id.toString());
+						}).done(done);
+					}));
+				});
+			});
 		});
 	});
 
@@ -162,7 +198,7 @@ describe('Orgs', function() {
 	});
 
 	describe('when retrieving an app user with invalid token', function() {
-		it("should reject with the correct message", function(done) {			
+		it("should reject with the correct message", function(done) {
 			orgModule.getApplicationUser(database.newId(), "user.username", "user.password").fail(function(err) {
 				err.should.equal("Application user was not found for given credentials. (O1)");
 			}).done(done);
@@ -170,7 +206,7 @@ describe('Orgs', function() {
 	});
 
 	describe('when retrieving an app user with invalid username', function() {
-		it("should reject with the correct message", function(done) {			
+		it("should reject with the correct message", function(done) {
 			var org = org1;
 			var app = org.applications[0];
 			var user = app.users[0];
@@ -181,7 +217,7 @@ describe('Orgs', function() {
 	});
 
 	describe('when retrieving an app user with invalid password', function() {
-		it("should reject with the correct message", function(done) {			
+		it("should reject with the correct message", function(done) {
 			var org = org1;
 			var app = org.applications[0];
 			var user = app.users[0];
@@ -227,14 +263,14 @@ describe('Orgs', function() {
 		});
 
 		// it('should add the org to the account', function(done) {
-			// var name = "Traffic Statistics";
-			// orgModule.create(userId, name, account1._id).then(function(newOrg) {
-				// database.collection("accounts").then(function(accountCol) {
-					// accountCol.getById(account1._id).then(function(accountInDatabase) {
-						// accountInDatabase.orgs.should.include(newOrg._id.toString());
-					// }).done(done);
-				// });
-			// });
+		// var name = "Traffic Statistics";
+		// orgModule.create(userId, name, account1._id).then(function(newOrg) {
+		// database.collection("accounts").then(function(accountCol) {
+		// accountCol.getById(account1._id).then(function(accountInDatabase) {
+		// accountInDatabase.orgs.should.include(newOrg._id.toString());
+		// }).done(done);
+		// });
+		// });
 		// });
 	});
 });

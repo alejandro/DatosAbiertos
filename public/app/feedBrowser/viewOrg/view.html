@@ -1,5 +1,16 @@
 <h1 data-bind="html: name"></h1>
 
+<h3>Administrators</h3>
+<ul data-bind="foreach: admins">
+	<li>
+		<span data-bind="html: displayName"></span> <a href="#" data-bind="click: $parent.removeAdmin">Remove</a>
+	</li>
+</ul>
+
+<button data-bind="click: addAdmin">
+	Add Admin
+</button>
+
 <h3>Feeds</h3>
 <ul data-bind="foreach: feeds">
 	<li>
@@ -14,7 +25,7 @@
 <h3>Applications</h3>
 <ul data-bind="foreach: applications">
 	<li>
-		<a data-bind="attr: {href:'/#/orgs/' + $parent.orgId() + '/applications/' + _id}"><span data-bind="html: name"></span></a>
+		<a data-bind="attr: {href:'/#/orgs/' + $parent.orgId() + '/applications/' + _id}"><span data-bind="html: name"></span><span data-bind="visible: !name">No Name</span></a>
 	</li>
 </ul>
 

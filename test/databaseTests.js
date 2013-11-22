@@ -90,7 +90,7 @@ describe('Database', function() {
 			var bson = require('mongodb').BSONPure;
 			var nonExistentId = new bson.ObjectID();
 			col.getById(nonExistentId).fail(function(err){
-				err.should.equal('Could not find the record with id "' + nonExistentId + '."');
+				err.should.equal('Could not find a test with id "' + nonExistentId + '."');
 			}).done(done);				
 		});
 		
@@ -119,7 +119,7 @@ describe('Database', function() {
 		it('should be able to remove an item by string id', function(done){
 			col.remove(john._id.toString()).then(function(removedItem){
 				col.getById(john._id).fail(function(err){
-					err.should.equal('Could not find the record with id "' + john._id.toString() + '."');
+					err.should.equal('Could not find a test with id "' + john._id.toString() + '."');
 				}).done(done);
 			});
 		});
@@ -127,7 +127,7 @@ describe('Database', function() {
 		it('should be able to remove an item by BSON id', function(done){
 			col.remove(john._id).then(function(removedItem){
 				col.getById(john._id).fail(function(err){
-					err.should.equal('Could not find the record with id "' + john._id.toString() + '."');
+					err.should.equal('Could not find a test with id "' + john._id.toString() + '."');
 				}).done(done);
 			});
 		});
@@ -135,7 +135,7 @@ describe('Database', function() {
 		it('should be able to remove items by query', function(done){
 			col.remove({Name:sam.Name}).then(function(removedItem){
 				col.getById(sam._id).fail(function(err){
-					err.should.equal('Could not find the record with id "' + sam._id.toString() + '."');
+					err.should.equal('Could not find a test with id "' + sam._id.toString() + '."');
 				}).done(done);
 			});
 		});

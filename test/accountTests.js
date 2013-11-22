@@ -13,7 +13,7 @@ describe('Accounts', function() {
 		email : "byron@acklenavenue.com"
 	};
 	var account2 = {
-		email : "mario@acklenavenue.com"
+		email : "byron.sommardahl@acklenavenue.com"
 	};
 	var account3 = {
 		email : "viktor@acklenavenue.com"
@@ -41,6 +41,34 @@ describe('Accounts', function() {
 		it('should return return the expected account', function(done) {
 			accountModule.getByEmail(account1.email).then(function(account) {
 				account.email.should.equal(account1.email);
+			}).done(done);
+		})
+	});
+
+	describe('when getting an account by id', function() {
+		it('should return return the expected account', function(done) {
+			accountModule.getById(account1._id).then(function(account) {
+				account.email.should.equal(account1.email);
+			}).done(done);
+		})
+	});
+
+	describe('when searching accounts by email', function() {
+		it('should return return the expected accounts', function(done) {
+			accountModule.search("byron").then(function(accounts) {
+				accounts.length.should.equal(2);
+				accounts[0].email.should.equal(account1.email);
+				accounts[1].email.should.equal(account2.email);
+			}).done(done);
+		})
+	});
+
+	describe('when getting multiple accounts by id', function() {
+		it('should return return the expected array of accounts', function(done) {
+			accountModule.getByIds([account1._id, account2._id, account3._id]).then(function(accounts) {
+				accounts[0].email.should.equal(account1.email);
+				accounts[1].email.should.equal(account2.email);
+				accounts[2].email.should.equal(account3.email);
 			}).done(done);
 		})
 	});

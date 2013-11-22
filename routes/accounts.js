@@ -1,6 +1,7 @@
 'use strict';
 
 var auth = require('../auth');
+var accounts = require('../modules/accounts');
 
 module.exports.init = function(app) {
 	app.get('/login/google', auth.authenticateWithGoogle);
@@ -12,6 +13,12 @@ module.exports.init = function(app) {
 
 	app.get('/login/check', auth.restrict, function(req, res){
 		res.end();
+	});
+	
+	app.get('/accounts/search/:text', auth.restrict, function(req, res){
+		accounts.search(req.params.text).done(function(matches){
+			res.json(matches);
+		})
 	});
 	
 	app.get('/api/auth', auth.authenticateWithUserAndToken, function(req, res){
