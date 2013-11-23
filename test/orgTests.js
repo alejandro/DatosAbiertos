@@ -317,4 +317,13 @@ describe('Orgs', function() {
 			});
 		});
 	});
+
+
+    describe('when archiving one org by id', function() {
+        it('should set the archive bit', function(done) {
+            orgModule.archive(userId, org1._id).then(function(org) {
+                org.archived.should.equal(true);
+            }).done(done);
+        })
+    });
 });
