@@ -1,4 +1,4 @@
-define(['feedBrowser/orgData', 'durandal/app'], function(orgData, app) {
+define(['feedBrowser/orgData', 'feedBrowser/accountData', 'durandal/app'], function(orgData, accountData, app) {
 
 	var viewModel = function() {
 
@@ -25,10 +25,16 @@ define(['feedBrowser/orgData', 'durandal/app'], function(orgData, app) {
 		};
 
 		var loadAdmins = function() {
-			admins.removeAll();
-			return orgData.getAdmins(orgId()).done(function(adminsFromServer) {
-				_.each(adminsFromServer, function(admin) {
-					admins.push(admin);
+			return accountData.me().then(function(me) {
+				admins.removeAll();
+				return orgData.getAdmins(orgId()).done(function(adminsFromServer) {
+					_.each(adminsFromServer, function(admin) {
+						admins.push({
+							_id : admin._id,
+							displayName : admin.displayName,
+							canRemove : admin._id != me._id
+						});
+					});
 				});
 			});
 		};
