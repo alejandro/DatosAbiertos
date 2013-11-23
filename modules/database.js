@@ -57,7 +57,6 @@ var database = function() {
 				var def = q.defer();
 				var bsonId;
 				try {
-
 					bsonId = new BSON.ObjectID(id.toString());
 				} catch(err) {
 					var msg = 'There was a problem with the provided Id "' + id + '." '
@@ -65,13 +64,15 @@ var database = function() {
 					def.reject(msg);
 				}
 				if (bsonId) {
+					var theColl = this.coll;
 					this.coll.findOne({
 						'_id' : bsonId
 					}, function(err, doc) {
 						if (err) {
 							def.reject(err);
-						} else if (!doc) {
-							def.reject('Could not find the record with id "' + id + '."');
+						} else if (!doc) {							
+							var msg = 'Could not find a ' + theColl.collectionName + ' with id "' + id + '."';
+							def.reject(msg);							
 						} else {
 							def.resolve(doc);
 						}

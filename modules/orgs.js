@@ -27,7 +27,50 @@ var mod = function() {
 		getCollection().then(function(col) {
 			col.add(userId, orgToAdd).then(function(newOrg) {
 				accounts.addOrg(userId, firstAdminAccountId, newOrg).then(function() {
-					 def.resolve(newOrg);
+					def.resolve(newOrg);
+				});
+			});
+		});
+		return def.promise;
+	};
+
+	var addAdminUser = function(userId, orgId, adminUserId) {
+		var def = q.defer();
+		getCollection().then(function(col) {
+			col.getById(orgId).then(function(org) {
+				if (!org.admins)
+					org.admins = [];
+				org.admins.push(adminUserId);
+				delete org.history;
+				col.modify(userId, orgId, org).then(function(modifiedOrg) {
+					accounts.addOrg(userId, adminUserId, modifiedOrg).then(function() {
+						def.resolve(modifiedOrg);
+					});
+				});
+			});
+		});
+		return def.promise;
+	};
+
+	var removeAdminUser = function(userId, orgId, adminUserId) {
+		var def = q.defer();
+		getCollection().then(function(col) {
+			col.getById(orgId).fail(function(err) {
+				console.log("Org Errior: " + err);
+			}).then(function(org) {
+				var modifiedAdmins = _.filter(org.admins || [], function(id) {
+					return id && id.toString() != adminUserId.toString();
+				});
+				col.modify(userId, orgId, {
+					admins : modifiedAdmins
+				}).then(function(modifiedOrg) {
+					console.log("removed user from org.")
+					accounts.removeOrg(userId, adminUserId, modifiedOrg).fail(function(err) {
+						console.log(err);
+					}).then(function() {
+						console.log("removed org from user.")
+						def.resolve(modifiedOrg);
+					});					
 				});
 			});
 		});
@@ -109,7 +152,7 @@ var mod = function() {
 
 	var getApplicationUser = function(appId, username, password) {
 		var def = q.defer();
-			
+
 		getCollection().then(function(col) {
 			col.getFirst({
 				applications : {
@@ -117,27 +160,27 @@ var mod = function() {
 						_id : database.getId(appId.toString())
 					}
 				}
-			}).fail(function(err){
+			}).fail(function(err) {
 				def.reject("Application user was not found for given credentials. (O1)")
-			}).then(function(org){
-			
+			}).then(function(org) {
+
 				var app = _.find(org.applications, function(a) {
 					return a._id.toString() == appId.toString()
 				});
-				if (!app){
+				if (!app) {
 					def.reject("Application user was not found for given credentials. (A1)")
-				}				
+				}
 				var user = _.find(app.users, function(u) {
 					return u.username == username && u.password == password
 				});
-				if(!user)
+				if (!user)
 					def.reject("Application user was not found for given credentials. (U1)");
 				def.resolve(user);
-					
+
 			});
-			
+
 		});
-		
+
 		return def.promise;
 	};
 
@@ -148,7 +191,9 @@ var mod = function() {
 		addApplication : addApplication,
 		addApplicationUser : addApplicationUser,
 		modifyApplicationUser : modifyApplicationUser,
-		getApplicationUser : getApplicationUser
+		getApplicationUser : getApplicationUser,
+		addAdminUser : addAdminUser,
+		removeAdminUser : removeAdminUser
 	};
 }();
 
