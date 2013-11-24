@@ -94,6 +94,7 @@ describe('Feeds', function() {
 		it('should return the expected feed', function(done) {
 			feedModule.get(feed1._id).then(function(feed) {
 				feed.name.should.equal(feed1.name);
+				feed.org.name.should.equal(org1.name);
 			}).done(done);
 		})
 	});

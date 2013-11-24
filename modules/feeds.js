@@ -1,5 +1,6 @@
 'use strict';
 
+var orgs	 = require('../modules/orgs.js');
 var database = require('../modules/database.js');
 var q        = require('q');
 var _        = require('underscore');
@@ -27,7 +28,12 @@ var mod = function() {
 
 	var getOne = function(id) {
 		return getCollection().then(function(col) {
-			return col.getById(id);
+			return col.getById(id).then(function(feed){
+				return orgs.getById(feed.orgId).then(function(org){
+					feed.org = org;
+					return feed;
+				});
+			});
 		});
 	};
 
