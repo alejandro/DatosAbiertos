@@ -1,4 +1,6 @@
-define(['feedBrowser/orgData', 'durandal/app'], function(orgData, app) {
+'use strict';
+
+define(['feedBrowser/orgData'], function(orgData) {
 
 	var viewModel = function() {
 
@@ -30,11 +32,11 @@ define(['feedBrowser/orgData', 'durandal/app'], function(orgData, app) {
 				orgId(org.orgId);
 				closeModal = function(code) {
 					self.modal.close(code);
-				}
+				};
 			}
 		};
 
 	}();
 
 	return viewModel;
-})
+});

@@ -107,6 +107,16 @@ describe('Orgs', function() {
 		});
 	});
 
+	describe('when changing the org code with duplicate in other org', function() {
+		it('should throw an error', function(done) {
+			orgModule.changeCode(userId, org1._id, "firemenOrg").fail(function(err){
+				err.should.equal("The org code 'firemenOrg' already exists in another org!");				
+			}).done(function(){
+				done();
+			});
+		});
+	});
+
 	describe('when getting an org by id', function() {
 		it('should return the expected org', function(done) {
 			orgModule.getById(org1._id).then(function(org) {
@@ -285,15 +295,26 @@ describe('Orgs', function() {
 			});
 		});
 
-		// it('should add the org to the account', function(done) {
-		// var name = "Traffic Statistics";
-		// orgModule.create(userId, name, account1._id).then(function(newOrg) {
-		// database.collection("accounts").then(function(accountCol) {
-		// accountCol.getById(account1._id).then(function(accountInDatabase) {
-		// accountInDatabase.orgs.should.include(newOrg._id.toString());
-		// }).done(done);
-		// });
-		// });
-		// });
+		it('should add the org to the account', function(done) {
+			var name = "Traffic Statistics";
+			var code = "trafficstats";
+			orgModule.create(userId, name, code, account1._id).then(function(newOrg) {
+				database.collection("accounts").then(function(accountCol) {
+					accountCol.getById(account1._id).then(function(accountInDatabase) {
+						accountInDatabase.orgs.should.include(newOrg._id.toString());
+					}).done(done);
+				});
+			});
+		});
+
+		it('should not allow duplicate org codes', function(done){
+			var name = "Some other firemen group";
+			var duplicateCode = "firemenOrg";
+			orgModule.create(userId, name, duplicateCode, account1._id).fail(function(err) {
+				err.should.equal("The org code 'firemenOrg' already exists in another org!");				
+			}).done(function(){
+				done();
+			});
+		});
 	});
 });
