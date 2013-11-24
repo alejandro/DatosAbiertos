@@ -9,12 +9,25 @@ var _ = require('underscore');
 module.exports.init = function(app) {
 
 	app.get('/orgs', auth.restrict, function(req, res) {
+		console.log("starting req.")
+		console.log(req.user);
 		accountModule.getByEmail(req.user.email).then(function(account) {
+			console.log("got account.")
 			orgModule.getAllForAccount(account._id).then(function(orgs) {
+				console.log("got org.")
 				res.json(orgs);
 			});
 		});
 	});
+
+	// app.get('/o/:orgCode/feeds', auth.restrict, function(req, res) {
+		// orgModule.getOrgByCode(req.params.orgCode).then(function(org) {
+			// feedModule.getAllByOrgId(org._id).then(function(feeds) {
+				// console.log('Returning ' + feeds.length + ' feeds.');
+				// res.json(feeds);
+			// });
+		// });
+	// });
 
 	app.get('/orgs/:orgId/feeds', auth.restrict, function(req, res) {
 		feedModule.getAllByOrgId(req.params.orgId).then(function(feeds) {
@@ -34,7 +47,9 @@ module.exports.init = function(app) {
 		});
 	});
 
-	app.delete('/orgs/:orgId/admins/:adminId', auth.restrict, function(req, res) {
+	app.
+	delete ('/orgs/:orgId/admins/:adminId', auth.restrict,
+	function(req, res) {
 		orgModule.removeAdminUser(req.user._id, req.params.orgId, req.params.adminId).then(function(org) {
 			res.json({
 				status : 'ok'

@@ -14,7 +14,7 @@ describe('Orgs', function() {
 	var org1 = {
 		_id : database.newId(),
 		name : "Police",
-		admins: [],
+		admins : [],
 		applications : [{
 			name : 'Web App',
 			_id : database.newId(),
@@ -27,6 +27,7 @@ describe('Orgs', function() {
 	};
 	var org2 = {
 		_id : database.newId(),
+		code : "firemenOrg",
 		name : "Firemen",
 		applications : [{
 			name : 'Android App',
@@ -102,9 +103,18 @@ describe('Orgs', function() {
 		});
 	});
 
+	describe('when getting an org by code', function() {
+		it('should return the expected org', function(done) {
+			orgModule.getByCode("firemenOrg").then(function(org) {	
+				console.log(org);			
+				org._id.toString().should.equal(org2._id.toString());
+			}).done(done);
+		});
+	});
+
 	describe('when removing an admin from an org', function() {
 		it('should remove the admin', function(done) {
-			orgModule.removeAdminUser(userId, org1._id, account1._id).then(function(org) {
+			orgModule.removeAdminUser(userId, org1._id, account1._id).then(function(org) {			
 				org.admins.should.not.include(account1._id);
 			}).done(done);
 		});
@@ -112,7 +122,7 @@ describe('Orgs', function() {
 
 	describe('when adding an org admin user', function() {
 		it('should add the user to the list of admins', function(done) {
-			var userIdToAdd = account2._id;			
+			var userIdToAdd = account2._id;
 			orgModule.addAdminUser(userId, org2._id, userIdToAdd).then(function(existingOrg) {
 				database.collection("orgs").then(function(col) {
 					col.getById(existingOrg._id).then(function(orgInDatabase) {

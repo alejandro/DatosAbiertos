@@ -19,7 +19,6 @@ database.connect(cfg.db.host, cfg.db.port, cfg.db.name).then(function() {
 		app.use(express.bodyParser());
 		app.set('port', cfg.port);
 		app.use(express.cookieParser());
-		console.log('Setting up session mgt...');
 		app.use(express.cookieSession({
 			secret: 'cafe el gringo'
 		}));

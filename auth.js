@@ -18,6 +18,7 @@ passport.use(new BasicWithTokenStrategy(function(username, password, token, done
 		});
 		done(null, user);
 	}).fail(function(err) {
+		console.log("Auth error: " + err);
 		//if err is not found, return done(null, false);
 		done(null, false);
 	});
@@ -34,18 +35,21 @@ var getAccountByEmail = function(email, done) {
 
 function validateUser(identifier, profile, done) {
 	var email = profile.emails[0].value;
+	console.log("Validating user...");
 	getAccountByEmail(email, done).fail(function(err) {
+		console.log("Error validating: " + err);
 		if (err == 'not found') {
 			console.log('### User not found. Creating... ');
 			accounts.create(email, profile.displayName, profile.name.givenName, profile.name.familyName).then(function(newAccount) {
 				console.log('### User created!');
-				console.log(newAccount);
 				newAccount = _.extend(newAccount, {
 					role : 'admin'
 				});
 				done(null, newAccount);
 			});
 		}
+	}).then(function(){
+		console.log("User validated!");
 	});
 }
 
@@ -57,14 +61,17 @@ var googleAuthConfig = {
 passport.use(new GoogleStrategy(googleAuthConfig, validateUser));
 
 passport.serializeUser(function(user, done) {
-	done(null, user);
+	done(null, user._id);
 });
 
-passport.deserializeUser(function(user, done) {
-	done(null, user);
+passport.deserializeUser(function(userId, done) {
+	accounts.getById(userId).done(function(user){
+		done(null, user);
+	});	
 });
 
 function restrict(req, res, next) {
+	console.log("Restricting without role...");
 	var rejectRequest = function(message) {
 		res.send({
 			error : message

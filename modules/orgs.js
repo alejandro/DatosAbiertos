@@ -18,6 +18,14 @@ var mod = function() {
 		});
 	};
 
+	var getByCode = function(code) {
+		return getCollection().then(function(col) {
+			return col.getFirst({
+				code : code
+			});
+		});
+	};
+
 	var create = function(userId, name, firstAdminAccountId) {
 		var def = q.defer();
 		var orgToAdd = {
@@ -64,13 +72,9 @@ var mod = function() {
 				col.modify(userId, orgId, {
 					admins : modifiedAdmins
 				}).then(function(modifiedOrg) {
-					console.log("removed user from org.")
-					accounts.removeOrg(userId, adminUserId, modifiedOrg).fail(function(err) {
-						console.log(err);
-					}).then(function() {
-						console.log("removed org from user.")
+					accounts.removeOrg(userId, adminUserId, modifiedOrg).then(function() {
 						def.resolve(modifiedOrg);
-					});					
+					});
 				});
 			});
 		});
@@ -193,7 +197,8 @@ var mod = function() {
 		modifyApplicationUser : modifyApplicationUser,
 		getApplicationUser : getApplicationUser,
 		addAdminUser : addAdminUser,
-		removeAdminUser : removeAdminUser
+		removeAdminUser : removeAdminUser,
+		getByCode : getByCode
 	};
 }();
 
