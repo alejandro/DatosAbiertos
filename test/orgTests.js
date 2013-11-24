@@ -95,6 +95,18 @@ describe('Orgs', function() {
 		});
 	});
 
+	describe('when changing the org code', function() {
+		it('should change the code', function(done) {
+			orgModule.changeCode(userId, org2._id, "newCode").then(function(modified) {
+				database.collection("orgs").then(function(col) {
+					col.getById(modified._id).then(function(orgInDatabase) {
+						orgInDatabase.code.should.equal("newCode");						
+					}).done(done);
+				});
+			})
+		});
+	});
+
 	describe('when getting an org by id', function() {
 		it('should return the expected org', function(done) {
 			orgModule.getById(org1._id).then(function(org) {
@@ -105,8 +117,7 @@ describe('Orgs', function() {
 
 	describe('when getting an org by code', function() {
 		it('should return the expected org', function(done) {
-			orgModule.getByCode("firemenOrg").then(function(org) {	
-				console.log(org);			
+			orgModule.getByCode("firemenOrg").then(function(org) {
 				org._id.toString().should.equal(org2._id.toString());
 			}).done(done);
 		});
@@ -114,7 +125,7 @@ describe('Orgs', function() {
 
 	describe('when removing an admin from an org', function() {
 		it('should remove the admin', function(done) {
-			orgModule.removeAdminUser(userId, org1._id, account1._id).then(function(org) {			
+			orgModule.removeAdminUser(userId, org1._id, account1._id).then(function(org) {
 				org.admins.should.not.include(account1._id);
 			}).done(done);
 		});
@@ -239,8 +250,8 @@ describe('Orgs', function() {
 
 	describe('when getting all orgs for an account', function() {
 		it('should return the expected orgs where account is an admin', function(done) {
-			orgModule.create(userId, "org1", account1._id).done(function(newOrg1) {
-				orgModule.create(userId, "org2", account1._id).done(function(newOrg2) {
+			orgModule.create(userId, "org1", "org1Code", account1._id).done(function(newOrg1) {
+				orgModule.create(userId, "org2", "org2Code", account1._id).done(function(newOrg2) {
 					orgModule.getAllForAccount(account1._id.toString()).then(function(orgs) {
 						orgs[0].name.should.equal(newOrg1.name);
 						orgs[1].name.should.equal(newOrg2.name);
@@ -262,10 +273,12 @@ describe('Orgs', function() {
 	describe('when creating a new org', function(specDone) {
 		it('should add the org to the database', function(done) {
 			var name = "Voting Records Test";
-			orgModule.create(userId, name, account1._id).then(function(newOrg) {
+			var code = "voting";
+			orgModule.create(userId, name, code, account1._id).then(function(newOrg) {
 				database.collection("orgs").then(function(col) {
 					return col.getById(newOrg._id).then(function(orgInDatabase) {
 						orgInDatabase.name.should.equal(name);
+						orgInDatabase.code.should.equal(code);
 						orgInDatabase.admins.should.include(account1._id.toString());
 					}).done(done);
 				});

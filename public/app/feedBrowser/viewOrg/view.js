@@ -3,6 +3,7 @@ define(['feedBrowser/orgData', 'feedBrowser/accountData', 'durandal/app'], funct
 	var viewModel = function() {
 
 		var name = ko.observable();
+		var code = ko.observable();
 		var orgId = ko.observable();
 		var feeds = ko.observableArray();
 		var applications = ko.observableArray();
@@ -11,6 +12,7 @@ define(['feedBrowser/orgData', 'feedBrowser/accountData', 'durandal/app'], funct
 		var loadOrg = function() {
 			return orgData.getById(orgId()).done(function(org) {
 				name(org.name);
+				code(org.code);
 				applications(org.applications);
 			});
 		};
@@ -35,6 +37,14 @@ define(['feedBrowser/orgData', 'feedBrowser/accountData', 'durandal/app'], funct
 							canRemove : admin._id != me._id
 						});
 					});
+				});
+			});
+		};
+
+		var changeOrgCode = function() {
+			app.showModal('feedBrowser/changeOrgCode/change', code()).then(function(newCode) {
+				orgData.changeCode(newCode, orgId()).then(function(){
+					code(newCode);
 				});
 			});
 		};
@@ -67,6 +77,7 @@ define(['feedBrowser/orgData', 'feedBrowser/accountData', 'durandal/app'], funct
 
 		return {
 			name : name,
+			code: code,
 			orgId : orgId,
 			feeds : feeds,
 			addAdmin : addAdmin,
@@ -75,6 +86,7 @@ define(['feedBrowser/orgData', 'feedBrowser/accountData', 'durandal/app'], funct
 			applications : applications,
 			addApplication : addApplication,
 			removeAdmin : removeAdmin,
+			changeOrgCode: changeOrgCode,
 			activate : function(args) {
 				orgId(args.id);
 				return loadOrg().then(loadFeeds).then(loadAdmins);

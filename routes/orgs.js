@@ -16,30 +16,36 @@ module.exports.init = function(app) {
 		});
 	});
 
-	// app.get('/o/:orgCode/feeds', auth.restrict, function(req, res) {
-		// orgModule.getOrgByCode(req.params.orgCode).then(function(org) {
-			// feedModule.getAllByOrgId(org._id).then(function(feeds) {
-				// console.log('Returning ' + feeds.length + ' feeds.');
-				// res.json(feeds);
-			// });
-		// });
-	// });
-
-	app.get('/orgs/:orgId/feeds', auth.restrict, function(req, res) {
-		feedModule.getAllByOrgId(req.params.orgId).then(function(feeds) {
-			console.log('Returning ' + feeds.length + ' feeds.');
+	var returnFeeds(req, res) {
+		feedModule.getAllByOrgId(org._id).then(function(feeds) {
 			res.json(feeds);
 		});
+	};
+	app.get('/:orgCode/feeds', auth.restrict, function(req, res) {
+		orgModule.getByCode(req.params.orgCode).then(function(org) {
+			returnFeeds(req, res);
+		});
+	});
+	app.get('/orgs/:orgId/feeds', auth.restrict, function(req, res) {
+		returnFeeds(req, res);
 	});
 
+	var returnAdmins = function(org, req, res) {
+		var adminIds = _.filter(org.admins || [], function(admin) {
+			return admin;
+		});
+		accountModule.getByIds(adminIds).then(function(admins) {
+			res.json(admins);
+		});
+	};
+	app.get('/:orgCode/admins', auth.restrict, function(req, res) {
+		orgModule.getByCode(req.params.orgCode).then(function(org) {
+			returnAdmins(org, req, res);
+		});
+	});
 	app.get('/orgs/:orgId/admins', auth.restrict, function(req, res) {
 		orgModule.getById(req.params.orgId).then(function(org) {
-			var adminIds = _.filter(org.admins || [], function(admin) {
-				return admin;
-			});
-			accountModule.getByIds(adminIds).then(function(admins) {
-				res.json(admins);
-			});
+			returnAdmins(org, req, res);
 		});
 	});
 
@@ -66,13 +72,19 @@ module.exports.init = function(app) {
 			res.json(org);
 		});
 	});
-
+	
 	app.post('/orgs', auth.restrict, function(req, res) {
-		accountModule.getByEmail(req.user.email).then(function(account) {
-			orgModule.create(req.user._id, req.body.name, account._id).done(function() {
-				res.json({
-					status : 'ok'
-				});
+		orgModule.create(req.user._id, req.body.name, req.body.code, req.user._id).done(function() {
+			res.json({
+				status : 'ok'
+			});
+		});
+	});
+
+	app.put('/orgs/:orgId/code', auth.restrict, function(req, res) {
+		orgModule.changeCode(req.user._id, req.params.orgId, req.body.code).done(function() {
+			res.json({
+				status : 'ok'
 			});
 		});
 	});

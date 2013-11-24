@@ -38,7 +38,10 @@ define(['server'], function(server) {
 			},
 			getAdmins : function(orgId) {
 				return api.get("orgs/" + orgId + "/admins");
-			}			
+			},
+			changeCode : function(code, orgId){
+				return api.put("orgs/" + orgId + "/code", {code: code});
+			}		
 		};
 	}(server);
 

@@ -26,10 +26,11 @@ var mod = function() {
 		});
 	};
 
-	var create = function(userId, name, firstAdminAccountId) {
+	var create = function(userId, name, code, firstAdminAccountId) {
 		var def = q.defer();
 		var orgToAdd = {
 			name : name,
+			code: code,
 			admins : [firstAdminAccountId.toString()]
 		};
 		getCollection().then(function(col) {
@@ -42,6 +43,12 @@ var mod = function() {
 		return def.promise;
 	};
 
+	var changeCode = function(userId, orgId, newCode){
+		return getCollection().then(function(col) {
+			return col.modify(userId, orgId, {code: newCode});
+		});
+	};
+	
 	var addAdminUser = function(userId, orgId, adminUserId) {
 		var def = q.defer();
 		getCollection().then(function(col) {
@@ -198,7 +205,8 @@ var mod = function() {
 		getApplicationUser : getApplicationUser,
 		addAdminUser : addAdminUser,
 		removeAdminUser : removeAdminUser,
-		getByCode : getByCode
+		getByCode : getByCode,
+		changeCode: changeCode
 	};
 }();
 
