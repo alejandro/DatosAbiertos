@@ -1,3 +1,9 @@
+Communicate with the development team! 
+=================
+Come on over to our chat room. http://www.hipchat.com/gl3wHkOGs
+
+----------------
+
 Facebook group - https://www.facebook.com/groups/292877094176167/
 
 Live site (during development) - http://datosabiertos.jit.su
