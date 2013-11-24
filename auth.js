@@ -18,8 +18,6 @@ passport.use(new BasicWithTokenStrategy(function(username, password, token, done
 		});
 		done(null, user);
 	}).fail(function(err) {
-		console.log("Auth error: " + err);
-		//if err is not found, return done(null, false);
 		done(null, false);
 	});
 }));
@@ -35,21 +33,15 @@ var getAccountByEmail = function(email, done) {
 
 function validateUser(identifier, profile, done) {
 	var email = profile.emails[0].value;
-	console.log("Validating user...");
 	getAccountByEmail(email, done).fail(function(err) {
-		console.log("Error validating: " + err);
 		if (err == 'not found') {
-			console.log('### User not found. Creating... ');
 			accounts.create(email, profile.displayName, profile.name.givenName, profile.name.familyName).then(function(newAccount) {
-				console.log('### User created!');
 				newAccount = _.extend(newAccount, {
 					role : 'admin'
 				});
 				done(null, newAccount);
 			});
 		}
-	}).then(function(){
-		console.log("User validated!");
 	});
 }
 
@@ -71,7 +63,6 @@ passport.deserializeUser(function(userId, done) {
 });
 
 function restrict(req, res, next) {
-	console.log("Restricting without role...");
 	var rejectRequest = function(message) {
 		res.send({
 			error : message
@@ -96,7 +87,6 @@ function restrictRole(role) {
 
 		if (req.isAuthenticated()) {
 			if (!role || (req.user.role && req.user.role.indexOf(role) > -1)) {
-				console.log("authorized request");
 				next();
 			} else {
 				rejectRequest(role + ' role required to access that feature.');

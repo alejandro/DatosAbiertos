@@ -9,12 +9,8 @@ var _ = require('underscore');
 module.exports.init = function(app) {
 
 	app.get('/orgs', auth.restrict, function(req, res) {
-		console.log("starting req.")
-		console.log(req.user);
 		accountModule.getByEmail(req.user.email).then(function(account) {
-			console.log("got account.")
 			orgModule.getAllForAccount(account._id).then(function(orgs) {
-				console.log("got org.")
 				res.json(orgs);
 			});
 		});
