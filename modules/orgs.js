@@ -21,22 +21,59 @@ var mod = function() {
 	var getByCode = function(code) {
 		return getCollection().then(function(col) {
 			return col.getFirst({
-				code : code
+				code: code
 			});
 		});
 	};
 
-	var create = function(userId, name, firstAdminAccountId) {
+	var create = function(userId, name, code, firstAdminAccountId) {
 		var def = q.defer();
 		var orgToAdd = {
-			name : name,
-			admins : [firstAdminAccountId.toString()]
+			name: name,
+			code: code,
+			admins: [firstAdminAccountId.toString()]
 		};
-		getCollection().then(function(col) {
+		var create = function(col) {
 			col.add(userId, orgToAdd).then(function(newOrg) {
 				accounts.addOrg(userId, firstAdminAccountId, newOrg).then(function() {
 					def.resolve(newOrg);
 				});
+			});
+		};
+		getCollection().then(function(col) {
+			col.getFirst({
+				code: code
+			}).then(function(org) {
+				def.reject("The org code '" + newCode + "' already exists in another org!");
+			}).fail(function() {
+				create(col);
+			});			
+		});
+		return def.promise;
+	};
+
+	var changeCode = function(userId, orgId, newCode) {
+		var def = q.defer();
+
+		var modify = function(col) {
+			col.modify(userId, orgId, {
+				code: newCode
+			}).then(function(org) {
+				def.resolve(org);
+			});
+		};
+
+		getCollection().then(function(col) {
+			col.getFirst({
+				code: newCode
+			}).then(function(org) {
+				if (org._id.toString() === orgId.toString()) {
+					modify(col);
+				} else {
+					def.reject("The org code '" + newCode + "' already exists in another org!");
+				}
+			}).fail(function() {
+				modify(col);
 			});
 		});
 		return def.promise;
@@ -70,7 +107,7 @@ var mod = function() {
 					return id && id.toString() != adminUserId.toString();
 				});
 				col.modify(userId, orgId, {
-					admins : modifiedAdmins
+					admins: modifiedAdmins
 				}).then(function(modifiedOrg) {
 					accounts.removeOrg(userId, adminUserId, modifiedOrg).then(function() {
 						def.resolve(modifiedOrg);
@@ -84,7 +121,7 @@ var mod = function() {
 	var getAllForAccount = function(accountId) {
 		return getCollection().then(function(coll) {
 			return coll.getAll({
-				admins : accountId.toString()
+				admins: accountId.toString()
 			});
 		});
 	};
@@ -94,12 +131,12 @@ var mod = function() {
 			return col.getById(orgId).then(function(org) {
 				var applications = org.applications || [];
 				applications.push({
-					_id : database.newId(),
-					name : applicationsName
+					_id: database.newId(),
+					name: applicationsName
 				});
 
 				return col.modify(userId, orgId, {
-					applications : applications
+					applications: applications
 				});
 			});
 		});
@@ -115,17 +152,17 @@ var mod = function() {
 							a.users = [];
 						}
 						a.users.push({
-							_id : database.newId(),
-							name : newUser.name,
-							username : newUser.username,
-							password : newUser.password,
-							email : newUser.email
+							_id: database.newId(),
+							name: newUser.name,
+							username: newUser.username,
+							password: newUser.password,
+							email: newUser.email
 						});
 					}
 				});
 
 				return col.modify(userId, orgId, {
-					applications : applications
+					applications: applications
 				});
 			});
 		});
@@ -148,7 +185,7 @@ var mod = function() {
 					return a;
 				});
 				return col.modify(userModifyingId, orgId, {
-					applications : applications
+					applications: applications
 				});
 			});
 		});
@@ -159,9 +196,9 @@ var mod = function() {
 
 		getCollection().then(function(col) {
 			col.getFirst({
-				applications : {
-					$elemMatch : {
-						_id : database.getId(appId.toString())
+				applications: {
+					$elemMatch: {
+						_id: database.getId(appId.toString())
 					}
 				}
 			}).fail(function(err) {
@@ -189,16 +226,17 @@ var mod = function() {
 	};
 
 	return {
-		getById : getById,
-		create : create,
-		getAllForAccount : getAllForAccount,
-		addApplication : addApplication,
-		addApplicationUser : addApplicationUser,
-		modifyApplicationUser : modifyApplicationUser,
-		getApplicationUser : getApplicationUser,
-		addAdminUser : addAdminUser,
-		removeAdminUser : removeAdminUser,
-		getByCode : getByCode
+		getById: getById,
+		create: create,
+		getAllForAccount: getAllForAccount,
+		addApplication: addApplication,
+		addApplicationUser: addApplicationUser,
+		modifyApplicationUser: modifyApplicationUser,
+		getApplicationUser: getApplicationUser,
+		addAdminUser: addAdminUser,
+		removeAdminUser: removeAdminUser,
+		getByCode: getByCode,
+		changeCode: changeCode
 	};
 }();
 

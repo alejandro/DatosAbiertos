@@ -9,6 +9,9 @@ define(['server'], function(server) {
 			getById : function(id) {
 				return api.get("orgs/" + id);
 			},
+			getByCode : function(orgCode) {
+				return api.get("orgs/" + orgCode);
+			},
 			getFeeds : function(orgId) {
 				return api.get("orgs/" + orgId + "/feeds");
 			},
@@ -26,7 +29,8 @@ define(['server'], function(server) {
 				});
 			},
 			removeAdmin : function(orgId, adminId) {
-				return api.delete("orgs/" + orgId + "/admins/" + adminId);
+				return api.
+				delete ("orgs/" + orgId + "/admins/" + adminId);
 			},
 			getApplications : function(orgId) {
 				return api.get("orgs/" + orgId + "/applications");
@@ -38,7 +42,12 @@ define(['server'], function(server) {
 			},
 			getAdmins : function(orgId) {
 				return api.get("orgs/" + orgId + "/admins");
-			}			
+			},
+			changeCode : function(code, orgId) {
+				return api.put("orgs/" + orgId + "/code", {
+					code : code
+				});
+			}
 		};
 	}(server);
 
