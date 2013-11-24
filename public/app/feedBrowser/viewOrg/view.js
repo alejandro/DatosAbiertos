@@ -32,9 +32,9 @@ define(['feedBrowser/orgData', 'feedBrowser/accountData', 'durandal/app'], funct
 				return orgData.getAdmins(orgId()).done(function(adminsFromServer) {
 					_.each(adminsFromServer, function(admin) {
 						admins.push({
-							_id : admin._id,
-							displayName : admin.displayName,
-							canRemove : admin._id != me._id
+							_id: admin._id,
+							displayName: admin.displayName,
+							canRemove: admin._id != me._id
 						});
 					});
 				});
@@ -42,8 +42,11 @@ define(['feedBrowser/orgData', 'feedBrowser/accountData', 'durandal/app'], funct
 		};
 
 		var changeOrgCode = function() {
-			app.showModal('feedBrowser/changeOrgCode/change', code()).then(function(newCode) {
-				orgData.changeCode(newCode, orgId()).then(function(){
+			app.showModal('feedBrowser/changeOrgCode/change', {
+				orgId: orgId(),
+				code: code()
+			}).then(function(newCode) {
+				orgData.changeCode(newCode, orgId()).then(function() {
 					code(newCode);
 				});
 			});
@@ -57,7 +60,7 @@ define(['feedBrowser/orgData', 'feedBrowser/accountData', 'durandal/app'], funct
 
 		var addAdmin = function() {
 			app.showModal('feedBrowser/addOrgAdmin/add', {
-				orgId : orgId()
+				orgId: orgId()
 			}).then(function(newAdmin) {
 				orgData.addAdmin(newAdmin._id, orgId()).then(loadAdmins);
 			});
@@ -76,18 +79,18 @@ define(['feedBrowser/orgData', 'feedBrowser/accountData', 'durandal/app'], funct
 		};
 
 		return {
-			name : name,
+			name: name,
 			code: code,
-			orgId : orgId,
-			feeds : feeds,
-			addAdmin : addAdmin,
-			admins : admins,
-			createFeed : createFeed,
-			applications : applications,
-			addApplication : addApplication,
-			removeAdmin : removeAdmin,
+			orgId: orgId,
+			feeds: feeds,
+			addAdmin: addAdmin,
+			admins: admins,
+			createFeed: createFeed,
+			applications: applications,
+			addApplication: addApplication,
+			removeAdmin: removeAdmin,
 			changeOrgCode: changeOrgCode,
-			activate : function(args) {
+			activate: function(args) {
 				orgId(args.id);
 				return loadOrg().then(loadFeeds).then(loadAdmins);
 			}

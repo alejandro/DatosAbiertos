@@ -8,6 +8,23 @@ var _ = require('underscore');
 
 module.exports.init = function(app) {
 
+	app.get('/orgs/:orgCodeOrId', auth.restrict, function(req, res) {
+		var codeOrId = req.params.orgCodeOrId;
+		if (codeOrId.length == 24) {
+			orgModule.getById(codeOrId).then(function(org) {
+				res.json(org);
+			}).fail(function(err){
+				res.json("{message:'Not found'}", 404);
+			});
+		} else {
+			orgModule.getByCode(codeOrId).then(function(org) {
+				res.json(org);
+			}).fail(function(err){
+				res.json("{message:'Not found'}", 404);
+			});
+		}
+	});
+
 	app.get('/orgs', auth.restrict, function(req, res) {
 		accountModule.getByEmail(req.user.email).then(function(account) {
 			orgModule.getAllForAccount(account._id).then(function(orgs) {
@@ -16,18 +33,18 @@ module.exports.init = function(app) {
 		});
 	});
 
-	var returnFeeds(req, res) {
+	var returnFeeds = function(org, req, res) {
 		feedModule.getAllByOrgId(org._id).then(function(feeds) {
 			res.json(feeds);
 		});
 	};
 	app.get('/:orgCode/feeds', auth.restrict, function(req, res) {
 		orgModule.getByCode(req.params.orgCode).then(function(org) {
-			returnFeeds(req, res);
+			returnFeeds(org, req, res);
 		});
 	});
 	app.get('/orgs/:orgId/feeds', auth.restrict, function(req, res) {
-		returnFeeds(req, res);
+		returnFeeds({_id: req.params.orgId}, req, res);
 	});
 
 	var returnAdmins = function(org, req, res) {
@@ -67,12 +84,6 @@ module.exports.init = function(app) {
 		});
 	});
 
-	app.get('/orgs/:id', auth.restrict, function(req, res) {
-		orgModule.getById(req.params.id).then(function(org) {
-			res.json(org);
-		});
-	});
-	
 	app.post('/orgs', auth.restrict, function(req, res) {
 		orgModule.create(req.user._id, req.body.name, req.body.code, req.user._id).done(function() {
 			res.json({

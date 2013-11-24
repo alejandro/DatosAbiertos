@@ -100,7 +100,7 @@ describe('Orgs', function() {
 			orgModule.changeCode(userId, org2._id, "newCode").then(function(modified) {
 				database.collection("orgs").then(function(col) {
 					col.getById(modified._id).then(function(orgInDatabase) {
-						orgInDatabase.code.should.equal("newCode");						
+						orgInDatabase.code.should.equal("newCode");
 					}).done(done);
 				});
 			})
