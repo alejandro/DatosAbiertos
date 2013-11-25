@@ -222,8 +222,16 @@ var mod = function() {
 
 		});
 
+
+		
 		return def.promise;
 	};
+
+    var archive =  function(userId, orgId){
+        return getCollection().then(function(col) {
+            return col.archive(userId, orgId);
+        });
+    };
 
 	return {
 		getById: getById,
@@ -234,6 +242,7 @@ var mod = function() {
 		modifyApplicationUser: modifyApplicationUser,
 		getApplicationUser: getApplicationUser,
 		addAdminUser: addAdminUser,
+        archive: archive,
 		removeAdminUser: removeAdminUser,
 		getByCode: getByCode,
 		changeCode: changeCode

@@ -133,4 +133,14 @@ module.exports.init = function(app) {
 			});
 		});
 	});
+
+    app.delete('/orgs/:id', function(req, res){
+        orgModule.archive(req.user._id, req.params.id).then(function(){
+
+            res.json({
+                status: 'ok'
+            });
+        });
+
+    });
 };

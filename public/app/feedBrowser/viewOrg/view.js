@@ -78,7 +78,7 @@ define(['feedBrowser/orgData', 'feedBrowser/accountData', 'durandal/app'], funct
 			});
 		};
 
-		return {
+        return {
 			name: name,
 			code: code,
 			orgId: orgId,
@@ -90,9 +90,15 @@ define(['feedBrowser/orgData', 'feedBrowser/accountData', 'durandal/app'], funct
 			addApplication: addApplication,
 			removeAdmin: removeAdmin,
 			changeOrgCode: changeOrgCode,
+            archive: function(){
+                orgData.archive(orgId());
+                loadOrg();
+            },
 			activate: function(args) {
 				orgId(args.id);
 				return loadOrg().then(loadFeeds).then(loadAdmins);
+
+
 			}
 		};
 	}();

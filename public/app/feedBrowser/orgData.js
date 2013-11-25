@@ -47,7 +47,11 @@ define(['server'], function(server) {
 				return api.put("orgs/" + orgId + "/code", {
 					code : code
 				});
-			}
+			},
+
+            archive: function(orgId){
+                return api.delete("orgs/"+ orgId);
+            }
 		};
 	}(server);
 
