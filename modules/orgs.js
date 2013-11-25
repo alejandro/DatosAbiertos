@@ -242,8 +242,7 @@ var mod = function() {
 		modifyApplicationUser: modifyApplicationUser,
 		getApplicationUser: getApplicationUser,
 		addAdminUser: addAdminUser,
-		getApplicationUser : getApplicationUser,
-        archive: archive
+        archive: archive,
 		removeAdminUser: removeAdminUser,
 		getByCode: getByCode,
 		changeCode: changeCode
