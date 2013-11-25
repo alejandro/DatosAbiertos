@@ -1,4 +1,6 @@
-define(['feedBrowser/feedData', 'durandal/app'], function(feedData, app) {
+'use strict';
+
+define(['underscore', 'feedBrowser/feedData', 'durandal/app'], function(_, feedData, app) {
 
 	var viewModel = function(data) {
 
@@ -19,7 +21,7 @@ define(['feedBrowser/feedData', 'durandal/app'], function(feedData, app) {
 
 		var addCollection = function() {
 			app.showModal('feedBrowser/createCollection/create').then(function(newCollection) {
-				feedData.addCollection(newCollection.name, feedId()).then(function() {
+				feedData.addCollection(feedId(), newCollection.name, newCollection.code).then(function() {
 					loadFeed();
 				});
 			});

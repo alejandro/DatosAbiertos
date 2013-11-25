@@ -1,7 +1,6 @@
 'use strict';
 
 var collectionModule = require('../modules/collections.js');
-var expect = require('chai').expect;
 var database = require('../modules/database.js');
 
 require('chai').should();
@@ -15,6 +14,7 @@ describe('Collections', function() {
 		name: 'test1',
 		collections: [{
 			_id: 'some really long bson id',
+			code: 'someCode',
 			name: 'test collection6'
 		}]
 	};
@@ -81,6 +81,15 @@ describe('Collections', function() {
 		it('should return the expected collection', function(done) {
 			var theCollection = feed1.collections[0];
 			collectionModule.getById(theCollection._id).then(function(collectionFromDb) {
+				collectionFromDb.feedId.toString().should.equal(feed1._id.toString());
+			}).done(done);
+		});
+	});
+
+	describe('when getting one collection by code', function() {
+		it('should return the expected collection', function(done) {
+			var theCollection = feed1.collections[0];
+			collectionModule.getByCode(feed1._id, theCollection.code).then(function(collectionFromDb) {
 				collectionFromDb.feedId.toString().should.equal(feed1._id.toString());
 			}).done(done);
 		});

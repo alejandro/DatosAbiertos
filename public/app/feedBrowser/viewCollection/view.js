@@ -12,13 +12,26 @@ define(['underscore', 'feedBrowser/feedData', 'durandal/app'], function(_, feedD
 		var feedId = ko.observable();
 		var collectionId = ko.observable();
 
+		var changeCollectionCode = function() {
+			var collectionObject = {
+				collectionId: collectionId(),
+				feedId: feedId(),
+				code: collectionCode()
+			};
+			app.showModal('feedBrowser/changeCollectionCode/change', collectionObject).then(function(newCode) {
+				feedData.changeCollectionCode(feedId(), collectionId(), newCode).then(function() {
+					loadCollection();
+				});
+			});
+		};
+
 		var loadCollection = function() {
 			return data.getById(feedId()).done(function(feed) {
 				name(feed.name);
 				orgCode(feed.org.code);
-				
+
 				var collection = _.find(feed.collections, function(c) {
-					return c._id == collectionId();
+					return c._id === collectionId();
 				});
 				fields.removeAll();
 
@@ -43,6 +56,7 @@ define(['underscore', 'feedBrowser/feedData', 'durandal/app'], function(_, feedD
 			name: name,
 			orgCode: orgCode,
 			collectionCode: collectionCode,
+			changeCollectionCode: changeCollectionCode,
 			fields: fields,
 			addField: addField,
 			feedId: feedId,

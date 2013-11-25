@@ -53,7 +53,8 @@ var mod = function() {
 							_id: c._id,
 							name: c.name,
 							orgId: f.orgId,
-							feedId: f._id
+							feedId: f._id,
+							code: c.code
 						};
 					});
 					collections = collections.concat(mappedCollections);
@@ -70,9 +71,36 @@ var mod = function() {
 		});
 	};
 
+	var getByCode = function(feedId, collectionCode) {
+		return getCollection().then(function(col) {
+			return col.getAll({
+				archived: {
+					$ne: true
+				}
+			}).then(function(feeds) {
+
+				var feed = _.find(feeds, function(f) {
+					return f._id.toString() === feedId.toString();
+				});
+				if (!feed) throw new Error('Feed not found with the id ' + feedId);
+
+				var match = _.find(feed.collections || [], function(c) {
+					return c.code === collectionCode;
+				});
+
+				match.feedId = feed._id;
+				
+				if (!match) throw new Error('Collection not found with the code ' + collectionCode);
+
+				return match;
+			});
+		});
+	};
+
 	return {
 		getAll: getAll,
-		getById: getById
+		getById: getById,
+		getByCode: getByCode
 	};
 }();
 
