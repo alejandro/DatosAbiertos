@@ -19,7 +19,7 @@ CollectionWithPromise.prototype.getById = function(id) {
     try {
       bsonId = new BSON.ObjectID(id.toString());
     } catch(err) {
-      var msg = 'There was a problem with the provided Id "' + id + '." '
+      var msg = 'There was a problem with the provided Id "' + id + '". '
       msg += 'It cannot be converted to BSON Id.'
       return def.reject(msg);
     }
@@ -30,7 +30,7 @@ CollectionWithPromise.prototype.getById = function(id) {
       if (err) {
         def.reject(err);
       } else if (!doc) {
-        def.reject('Could not find the record with id "' + id + '."');
+        def.reject('Could not find the record with id "' + id + '".');
       } else {
         def.resolve(doc);
       }

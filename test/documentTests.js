@@ -1,27 +1,27 @@
-"use strict";
+'use strict';
 
-var collectionDataModule = require("../modules/documents.js");
-var chai = require('chai');
+var chai                 = require('chai');
+var moment               = require('moment');
+var q                    = require('q');
+var collectionDataModule = require('../modules/documents.js');
+var database             = require('../modules/database.js');
+var fixtures             = require('./fixtures/before')(database);
+var should               = chai.should();
+
 chai.Assertion.includeStack = true;
-var should = chai.should();
-var database = require("../modules/database.js");
-var q = require("q");
-var moment = require('moment');
 
 describe('Documents', function() {
 
-	var userId = database.newId();
-
-	var feedId = database.newId();
+	var userId       = database.newId();
+	var feedId       = database.newId();
 	var collectionId = database.newId();
-
 	var feed = {
 		_id : feedId,
 		archived : true,
 		name : 'test3',
 		collections : [{
 			_id : collectionId,
-			name : "test collection",
+			name : 'test collection',
 			fields : [{
 				dataType : 'text',
 				name : 'Name',
@@ -36,37 +36,36 @@ describe('Documents', function() {
 			}]
 		}]
 	};
-
-	beforeEach(function(done) {
-		var deleteAll = function(collectionName, callback) {
-			database.currentConnection.collection(collectionName, function(err, coll) {
-				coll.remove({}, callback);
-			});
-		}
-		var addFeeds = function(callback) {
-
-			database.collection("feeds").then(function(coll) {
-				coll.add(userId, feed).then(function() {
-					callback();
-				});
-			});
-		};
-
-		database.drop(collectionId.toString()).then(function() {
-			deleteAll("feeds", function() {
-				addFeeds(function() {
-					done();
-				});
-			});
+	var deleteAll = function(collectionName) {
+		var def = q.defer();
+		database.currentConnection.collection(collectionName, function(err, coll) {
+			coll.remove({}, def.resolve);
 		});
+		return def.promise;
+	}
+	var addFeeds = function() {
+		var def = q.defer();
+		database.collection('feeds').then(function(coll) {
+			return coll.add(userId, feed)
+		}).then(function() {
+			def.resolve();
+		});
+		return def.promise;
+	};
+	beforeEach(function(done) {
+		database.drop(collectionId.toString()).then(function() {
+			return deleteAll('feeds');
+		}).then(function (){
+			return addFeeds();
+		}).then(fixtures.ok).done(done);
 	});
 
-	describe("when validating a new document", function() {
-		describe("where new document doesn't follow the validation rules", function() {
-			it("should return validation errors", function(done) {
+	describe('when validating a new document', function() {
+		describe('where new document doesn\'t follow the validation rules', function() {
+			it('should return validation errors', function(done) {
 
 				var newDoc = {
-					Name : "new name without colon"
+					Name : 'new name without colon'
 				};
 
 				collectionDataModule.validateNewDocument(feedId, collectionId, newDoc).then(function(result) {
@@ -76,11 +75,11 @@ describe('Documents', function() {
 			});
 		});
 		
-		describe("where new document follows the validation rules", function() {
-			it("should return an empty array", function(done) {
+		describe('where new document follows the validation rules', function() {
+			it('should return an empty array', function(done) {
 
 				var newDoc = {
-					Name : ":new name with colon"
+					Name : ':new name with colon'
 				};
 
 				collectionDataModule.validateNewDocument(feedId, collectionId, newDoc).then(function(result) {
@@ -90,17 +89,17 @@ describe('Documents', function() {
 		});
 	});
 
-	describe("when validating a document with modifications", function() {
-		describe("where modified document doesn't follow the validation rules", function() {
-			it("should return validation errors", function(done) {
+	describe('when validating a document with modifications', function() {
+		describe('where modified document doesn\'t follow the validation rules', function() {
+			it('should return validation errors', function(done) {
 
 				var testDocument = {
-					Name : ":test",
-					Color : "red"
+					Name : ':test',
+					Color : 'red'
 				};
 
 				var modifications = {
-					Name : "new name without colon"
+					Name : 'new name without colon'
 				};
 
 				database.collection(collectionId.toString()).then(function(c) {
@@ -114,38 +113,38 @@ describe('Documents', function() {
 			});
 		});
 
-		describe("where modified follows the validation rules", function() {
-			it("should return an empty array", function(done) {
+		describe('where modified follows the validation rules', function() {
+			it('should return an empty array', function(done) {
 
 				var testDocument = {
-					Name : ":test",
-					Color : "red"
+					Name : ':test',
+					Color : 'red'
 				};
 
 				var modifications = {
-					Name : ":new name with colon"
+					Name : ':new name with colon'
 				};
 
 				database.collection(collectionId.toString()).then(function(c) {
 					c.add(userId, testDocument).then(function(doc) {
-						collectionDataModule.validateModifications(feedId, collectionId, doc._id, modifications).then(function(result) {
-							result.length.should.equal(0);
-						}).done(done);
-					});
+						return collectionDataModule.validateModifications(feedId, collectionId, doc._id, modifications)
+					}).then(function(result) {
+						result.length.should.equal(0);
+					}).done(done);
 				});
 			});
 		});
 	});
 
-	describe("when modifying the data in a document", function() {
+	describe('when modifying the data in a document', function() {
 
-		// describe("where document doesn't follow the validation rules", function() {
-		// it("should fail with validation errors", function(done) {
+		// describe('where document doesn't follow the validation rules', function() {
+		// it('should fail with validation errors', function(done) {
 		//
 		// var testDocument = {
-		// Name : "test",
-		// Color : "red",
-		// ExtraField : "something unwelcome"
+		// Name : 'test',
+		// Color : 'red',
+		// ExtraField : 'something unwelcome'
 		// };
 		//
 		// var changes = { };
@@ -161,12 +160,12 @@ describe('Documents', function() {
 		// });
 		// });
 
-		describe("where follows the validation rules", function() {
-			it("should update the document in the database", function(done) {
+		describe('where follows the validation rules', function() {
+			it('should update the document in the database', function(done) {
 
 				var testDocument = {
-					Name : ":test",
-					Color : "red"
+					Name : ':test',
+					Color : 'red'
 				};
 
 				var changes = {
@@ -176,11 +175,11 @@ describe('Documents', function() {
 
 				database.collection(collectionId.toString()).then(function(c) {
 					c.add(userId, testDocument).then(function(doc) {
-						collectionDataModule.modify(userId, collectionId, doc._id, changes).then(function(modifiedDocument) {
-							modifiedDocument.Name.should.equal(changes.Name);
-							modifiedDocument.Color.should.equal(changes.Color);
-						}).done(done);
-					});
+						return collectionDataModule.modify(userId, collectionId, doc._id, changes)
+					}).then(function(modifiedDocument) {
+						modifiedDocument.Name.should.equal(changes.Name);
+						modifiedDocument.Color.should.equal(changes.Color);
+					}).done(done);
 				});
 			});
 		});
@@ -192,19 +191,19 @@ describe('Documents', function() {
 			var now = new Date();
 
 			var testDocument = {
-				Name : ":test",
-				Color : "red",
+				Name : ':test',
+				Color : 'red',
 				cost : 5,
 				paidOn : now
 			};
 
 			database.collection(collectionId.toString()).then(function(c) {
-				c.add(userId, testDocument).then(function(doc) {
-					collectionDataModule.archiveDocument(userId, collectionId, doc._id).then(function(archivedDoc) {
-						archivedDoc.archived.should.equal(true);
-					}).done(done);
-				});
-			});
+				return c.add(userId, testDocument)
+			}).then(function(doc) {
+				return collectionDataModule.archiveDocument(userId, collectionId, doc._id)
+			}).then(function(archivedDoc) {
+				archivedDoc.archived.should.equal(true);
+			}).done(done);
 		});
 	});
 
@@ -213,13 +212,13 @@ describe('Documents', function() {
 			var now = moment().valueOf();
 			var userId = database.newId();
 			collectionDataModule.addData(userId, collectionId, {
-				Name : ":Toyota Tacoma",
-				Color : "red",
+				Name : ':Toyota Tacoma',
+				Color : 'red',
 				cost : 10000,
 				paidOn : now
 			}).then(function(newData) {
-				newData.Name.should.equal(":Toyota Tacoma");
-				newData.Color.should.equal("red");
+				newData.Name.should.equal(':Toyota Tacoma');
+				newData.Color.should.equal('red');
 				newData.cost.should.equal(10000);
 				newData.paidOn.toString().should.equal(now.toString());
 				newData._id.should.not.be.null;
@@ -242,23 +241,23 @@ describe('Documents', function() {
 
 			database.collection(collectionId.toString()).then(function(c) {
 				c.add(userId, {
-					Name : ":test",
-					Color : "red",
+					Name : ':test',
+					Color : 'red',
 					cost : 5,
 					paidOn : now
 				});
 				return c;
 			}).then(function(c) {
 				c.add(userId, {
-					Name : "test2",
+					Name : 'test2',
 					archived : true
 				})
 			}).done(function() {
 
 				collectionDataModule.getAll(collectionId).then(function(documents) {
 					documents.length.should.equal(1);
-					documents[0].Name.should.equal(":test");
-					documents[0].Color.should.equal("red");
+					documents[0].Name.should.equal(':test');
+					documents[0].Color.should.equal('red');
 					documents[0].cost.should.equal(5);
 					documents[0].paidOn.toString().should.equal(now.toString());
 					documents[0]._id.should.not.be.null;
@@ -275,36 +274,36 @@ describe('Documents', function() {
 
 			database.collection(collectionId.toString()).then(function(c) {
 				c.add(userId, {
-					Name : ":test2",
-					Color : "red",
+					Name : ':test2',
+					Color : 'red',
 					cost : 5,
 					paidOn : now
 				});
 				return c;
 			}).then(function(c) {
 				c.add(userId, {
-					Name : ":test1",
-					Color : "blueberry",
+					Name : ':test1',
+					Color : 'blueberry',
 					cost : 10,
 					paidOn : now
 				});
 				return c;
 			}).then(function(c) {
 				c.add(userId, {
-					Name : ":test3",
+					Name : ':test3',
 					cost : 10,
 					paidOn : now
 				});
 			}).done(function() {
 
 				var query = {
-					"$where" : "(this.Color||'').indexOf('blue')>-1"
+					'$where' : "(this.Color||'').indexOf('blue')>-1"
 				};
 
 				collectionDataModule.getAll(collectionId, query).then(function(documents) {
 					documents.length.should.equal(1);
-					documents[0].Name.should.equal(":test1");
-					documents[0].Color.should.equal("blueberry");
+					documents[0].Name.should.equal(':test1');
+					documents[0].Color.should.equal('blueberry');
 					documents[0].cost.should.equal(10);
 					documents[0].paidOn.toString().should.equal(now.toString());
 					documents[0]._id.should.not.be.null;

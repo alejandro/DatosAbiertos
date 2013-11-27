@@ -1,12 +1,15 @@
-"use strict";
+'use strict';
 
-var validationModule = require("../modules/validation.js");
-var chai = require('chai');
-var moment = require('moment');
+var chai             = require('chai');
+var moment           = require('moment');
+var q                = require('q');
+var validationModule = require('../modules/validation.js');
+var database         = require('../modules/database.js');
+var fixtures 				 = require('./fixtures/before')(database);
+var should           = chai.should();
+
 chai.Assertion.includeStack = true;
-var should = chai.should();
-var database = require("../modules/database.js");
-var q = require("q");
+
 
 describe('Validation', function() {
 
@@ -21,7 +24,7 @@ describe('Validation', function() {
 		name : 'test3',
 		collections : [{
 			_id : collectionId,
-			name : "test collection1",
+			name : 'test collection1',
 			fields : [{
 				_id : database.newId(),
 				name : 'First Name',
@@ -39,7 +42,7 @@ describe('Validation', function() {
 					_id : database.newId(),
 					code : 'textEqualTo',
 					value : 'Sommardahl',
-					message : "Custom validation message"
+					message : 'Custom validation message'
 				}]
 			}]
 		}]
@@ -47,24 +50,25 @@ describe('Validation', function() {
 
 	beforeEach(function(done) {
 		var deleteAll = function(collectionName, callback) {
+			var def = q.defer();
 			database.currentConnection.collection(collectionName, function(err, coll) {
-				coll.remove({}, callback);
+				coll.remove({}, def.resolve);
 			});
+			return def.promise;
 		}
 		var addFeeds = function(callback) {
-
-			database.collection("feeds").then(function(coll) {
+			var def = q.defer();
+			database.collection('feeds').then(function(coll) {
 				coll.add(userId, feed).then(function() {
-					callback();
+					def.resolve();
 				});
 			});
-		};
+			return def.promise;
+		};	
 
-		deleteAll("feeds", function() {
-			addFeeds(function() {
-				done();
-			});
-		});
+		fixtures.deleteAll('feeds').then(function() {
+			return addFeeds();
+		}).then(fixtures.ok).done(done);
 	});
 
 	describe('when validating a document', function() {
@@ -207,13 +211,13 @@ describe('Validation', function() {
 		
 		describe('where validation type is "dateDayEquals"', function() {
 			it('should return false for a non-match', function(done) {
-				var result = validationModule.fieldIsValid('dateDayEquals', moment("1-1-2013"), moment("1-2-2013"));
+				var result = validationModule.fieldIsValid('dateDayEquals', moment('1-1-2013'), moment('1-2-2013'));
 				result.should.be.false;
 				done();
 			});
 			
 			it('should return true for a match', function(done) {
-				var result = validationModule.fieldIsValid('dateDayEquals', moment("1-1-2013"), moment("1-1-2013"));
+				var result = validationModule.fieldIsValid('dateDayEquals', moment('1-1-2013'), moment('1-1-2013'));
 				result.should.be.true;
 				done();
 			})
@@ -221,13 +225,13 @@ describe('Validation', function() {
 		
 		describe('where validation type is "dateAfter"', function() {
 			it('should return false for a non-match', function(done) {
-				var result = validationModule.fieldIsValid('dateAfter', moment("1-10-2013"), moment("1-1-2013"));
+				var result = validationModule.fieldIsValid('dateAfter', moment('1-10-2013'), moment('1-1-2013'));
 				result.should.be.false;
 				done();
 			});
 			
 			it('should return true for a match', function(done) {
-				var result = validationModule.fieldIsValid('dateAfter', moment("1-10-2013"), moment("1-20-2013"));
+				var result = validationModule.fieldIsValid('dateAfter', moment('1-10-2013'), moment('1-20-2013'));
 				result.should.be.true;
 				done();
 			})
@@ -235,13 +239,13 @@ describe('Validation', function() {
 		
 		describe('where validation type is "dateBefore"', function() {
 			it('should return false for a non-match', function(done) {
-				var result = validationModule.fieldIsValid('dateBefore', moment("1-1-2013"), moment("1-10-2013"));
+				var result = validationModule.fieldIsValid('dateBefore', moment('1-1-2013'), moment('1-10-2013'));
 				result.should.be.false;
 				done();
 			});
 			
 			it('should return true for a match', function(done) {
-				var result = validationModule.fieldIsValid('dateBefore', moment("1-10-2013"), moment("1-2-2013"));
+				var result = validationModule.fieldIsValid('dateBefore', moment('1-10-2013'), moment('1-2-2013'));
 				result.should.be.true;
 				done();
 			})
@@ -266,10 +270,10 @@ describe('Validation', function() {
 	//
 	// describe('when creating a feed', function() {
 	// it('should create the feed in the database', function(done) {
-	// feedModule.create(userId, "New Feed", org1._id).then(function(newFeed) {
-	// database.collection("feeds").then(function(col) {
+	// feedModule.create(userId, 'New Feed', org1._id).then(function(newFeed) {
+	// database.collection('feeds').then(function(col) {
 	// col.getById(newFeed._id).then(function(feedFromDatabase) {
-	// feedFromDatabase.name.should.equal("New Feed");
+	// feedFromDatabase.name.should.equal('New Feed');
 	// feedFromDatabase.orgId.should.equal(org1._id.toString());
 	// }).done(done);
 	// });
@@ -277,24 +281,24 @@ describe('Validation', function() {
 	// });
 	// });
 	//
-	// describe("when correcting the name of a feed", function() {
-	// it("should update the name in the database", function(done) {
-	// feedModule.correctName(userId, feed3._id, "corrected name").then(function(modifiedFeed) {
-	// database.collection("feeds").then(function(col) {
+	// describe('when correcting the name of a feed', function() {
+	// it('should update the name in the database', function(done) {
+	// feedModule.correctName(userId, feed3._id, 'corrected name').then(function(modifiedFeed) {
+	// database.collection('feeds').then(function(col) {
 	// col.getById(modifiedFeed._id).then(function(feedFromDatabase) {
-	// feedFromDatabase.name.should.equal("corrected name");
+	// feedFromDatabase.name.should.equal('corrected name');
 	// }).done(done);
 	// });
 	// });
 	// });
 	// });
 	//
-	// describe("when adding a collection to a feed", function() {
-	// it("should add the collection in the database", function(done) {
-	// feedModule.addCollection(userId, feed2._id, "collection name").then(function(modifiedFeed) {
-	// database.collection("feeds").then(function(col) {
+	// describe('when adding a collection to a feed', function() {
+	// it('should add the collection in the database', function(done) {
+	// feedModule.addCollection(userId, feed2._id, 'collection name').then(function(modifiedFeed) {
+	// database.collection('feeds').then(function(col) {
 	// col.getById(modifiedFeed._id).then(function(feedFromDatabase) {
-	// feedFromDatabase.collections[0].name.should.equal("collection name");
+	// feedFromDatabase.collections[0].name.should.equal('collection name');
 	// feedFromDatabase.collections[0]._id.should.not.be.null;
 	// }).done(done);
 	// });
@@ -302,14 +306,14 @@ describe('Validation', function() {
 	// });
 	// });
 	//
-	// describe("when adding a field to a collection", function() {
-	// it("should add the field in the database", function(done) {
+	// describe('when adding a field to a collection', function() {
+	// it('should add the field in the database', function(done) {
 	// //feed3 is the one with an existing collection
-	// feedModule.addField(userId, feed3._id, feed3.collections[0]._id, "field name", "number").then(function(modifiedFeed) {
-	// database.collection("feeds").then(function(col) {
+	// feedModule.addField(userId, feed3._id, feed3.collections[0]._id, 'field name', 'number').then(function(modifiedFeed) {
+	// database.collection('feeds').then(function(col) {
 	// col.getById(modifiedFeed._id).then(function(feedFromDatabase) {
-	// feedFromDatabase.collections[0].fields[0].name.should.equal("field name");
-	// feedFromDatabase.collections[0].fields[0].dataType.should.equal("number");
+	// feedFromDatabase.collections[0].fields[0].name.should.equal('field name');
+	// feedFromDatabase.collections[0].fields[0].dataType.should.equal('number');
 	// feedFromDatabase.collections[0].fields[0]._id.should.not.be.null;
 	// }).done(done);
 	// });
@@ -317,19 +321,19 @@ describe('Validation', function() {
 	// });
 	// });
 	//
-	// describe("when modifying a field", function() {
-	// it("should change the field in the database", function(done) {
+	// describe('when modifying a field', function() {
+	// it('should change the field in the database', function(done) {
 	// var feedId = feed1._id;
-	// feedModule.addCollection(userId, feedId, "modifying a field test").then(function(modifiedFeed) {
+	// feedModule.addCollection(userId, feedId, 'modifying a field test').then(function(modifiedFeed) {
 	// var collection = modifiedFeed.collections[0];
-	// feedModule.addField(userId, feedId, collection._id, "old field name").then(function(modifiedFeedWithField) {
+	// feedModule.addField(userId, feedId, collection._id, 'old field name').then(function(modifiedFeedWithField) {
 	// var field = modifiedFeedWithField.collections[0].fields[0];
 	//
-	// feedModule.modifyField(userId, feedId, collection._id, field._id, "new name", "date").then(function(feedWithModifiedField) {
+	// feedModule.modifyField(userId, feedId, collection._id, field._id, 'new name', 'date').then(function(feedWithModifiedField) {
 	// var modifiedField = feedWithModifiedField.collections[0].fields[0];
 	//
-	// modifiedField.name.should.equal("new name");
-	// modifiedField.dataType.should.equal("date");
+	// modifiedField.name.should.equal('new name');
+	// modifiedField.dataType.should.equal('date');
 	//
 	// }).done(done);
 	// });
@@ -337,11 +341,11 @@ describe('Validation', function() {
 	// });
 	// });
 	//
-	// describe("when adding a collection to a feed without a name", function() {
+	// describe('when adding a collection to a feed without a name', function() {
 	// var nothing;
-	// it("should throw an exception", function(done) {
+	// it('should throw an exception', function(done) {
 	// feedModule.addCollection(userId, feed3._id, nothing).fail(function(err) {
-	// err.should.equal("Validation error! Must include name when creating a collection.");
+	// err.should.equal('Validation error! Must include name when creating a collection.');
 	// }).done(done);
 	// });
 	// });

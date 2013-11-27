@@ -29,7 +29,7 @@
     "mocha": "~1.10.0"
   },
   "scripts": {
-    "test": "mocha",
+    "test": "mocha -t 3500",
     "start": "node app.js"
   },
   "repository": {
