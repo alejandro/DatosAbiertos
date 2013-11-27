@@ -1,111 +1,276 @@
 <html>
 	<head>
 		<title>ASJ: School Days</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="">
+		<meta name="author" content="">
+		<link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+
+		<style type="text/css">
+			#dataEntry {
+				text-align: center;
+			}
+			.item .title {
+				font-size: 1.1em;
+			}
+			.item .data {
+				font-size: 1.5em;
+				margin-left: 10px;
+				border-bottom: dotted 1px #333333;
+			}
+			#send {
+				margin-top: 15px;
+				margin-bottom: 20px;
+			}
+			/* Sticky footer styles
+			 -------------------------------------------------- */
+
+			html, body {
+				height: 100%;
+				/* The html and body elements cannot have any padding or margin. */
+			}
+
+			/* Wrapper for page content to push down footer */
+			#wrap {
+				min-height: 100%;
+				height: auto !important;
+				height: 100%;
+				/* Negative indent footer by it's height */
+				margin: 0 auto -60px;
+			}
+
+			/* Set the fixed height of the footer here */
+			#push, #footer {
+				height: 60px;
+			}
+			#footer {
+				background-color: #f5f5f5;
+			}
+
+			/* Lastly, apply responsive CSS fixes as necessary */
+			@media (max-width: 767px) {
+				#footer {
+					margin-left: -20px;
+					margin-right: -20px;
+					padding-left: 20px;
+					padding-right: 20px;
+				}
+			}
+
+			/* Custom page CSS
+			 -------------------------------------------------- */
+			/* Not required for template or sticky footer method. */
+
+			.container {
+				width: auto;
+				max-width: 680px;
+			}
+			.container .credit {
+				margin: 20px 0;
+			}
+
+		</style>
 	</head>
 	<body>
-		<h1>ASJ: School Days</h1>
 
-		<p>
-			This single page app will present a form and will post the contents to the Datos Abiertos repository. Then it will display a thank you message.
-		</p>
+		<div id="wrap">
+			<div class="container">
 
-		<table id='form'>
-			<tr>
-				<th>Date</th>
-				<td><span id='today'></span></td>
-			</tr>
-			<tr>
-				<th>School</th>
-				<td>
-				<select id='schools'/>
-				</td>
-			</tr>
-			<tr>
-				<th>Open</th>
-				<td><label for='open_yes'>Yes</label>
-				<input type='radio' name='open' id='open_yes' value="yes" />
-				<label for='open_no'>No</label>
-				<input type='radio' name='open' id='open_no' value="no" />
-				</td>
-			</tr>
-			<tr>
-				<th></th>
-				<td>
-				<button id='send'>
-					Send
-				</button></td>
-			</tr>
-		</table>
+				<div class="masthead">
+					<ul class="nav nav-pills pull-right">
+						<li class="active">
+							<a href="/schoolDays.html">Reiniciar</a>
+						</li>
+					</ul>
+					<h3 class="muted">ASJ: 200 Dias</h3>
+				</div>
 
-		<div id='thanks' style='display: none;'>
-			<h3>Thank you!</h3>
-			<p>
-				The data has been submitted to the server.
-			</p>
+				<hr>
+
+				<div class="alert alert-danger" id='loginFailed' style="display: none">
+					<strong>Invalido</strong> No se pudo ingresarse a su cuenta. Por favor, revise su contrasena.
+				</div>
+
+				<div class="alert alert-warning" id='schoolAlreadyReportedToday' style="display: none">
+					<strong>AVISO:</strong> Esta escuela ya tiene un informe de hoy.
+				</div>
+
+				<div class="alert alert-danger" id='sorryNoSchools' style="display: none">
+					<strong>Lo sentimos...</strong> Usted no tiene ninguna escuela asociado con su cuenta. Por favor, hable con su supervisor.
+				</div>
+
+				<div class="alert alert-success" id='thanks' style='display: none;'>
+					<strong>Gracias!</strong> Su informe fue recibido por el servidor.
+				</div>
+
+				<div id='dataEntry' style="display: none">
+
+					<p class='item'>
+						<span class='title'>Observador</span>
+						<span class='data' id='workerName'></span>
+					</p>
+
+					<p class="item">
+						<span class='title'>Fecha</span>
+						<span class='data' id='today'></span>
+					</p>
+
+					<p class="item">
+						<span class='title'>Escuela</span>
+
+						<span id='multipleSchools' style="display: none"> <select class='data' id='schools'></select> </span>
+
+						<span id='singleSchool'> <span class='data' id='school'/> </span>
+					</p>
+
+					<div id="openClosed">
+						<button type="button" class="btn btn-default btn-lg" id='setOpen'>
+							<span class="glyphicon glyphicon-thumbs-up" style="vertical-align:middle"></span>
+							Abierto
+						</button>
+						<button type="button" class="btn btn-default btn-lg" id='setClosed'>
+							<span class="glyphicon glyphicon-thumbs-down" style="vertical-align:middle"></span>
+							Cerrado
+						</button>
+					</div>
+
+					<button id='send' class='btn btn-default'>
+						Enviar Informe
+					</button>
+
+				</div>
+
+			</div>
+
+			<div id="push"></div>
 		</div>
 
-		<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+		<div id="footer">
+			<div class="container">
+				<p class="muted credit">
+					Esta aplicacion orgullosomente promoeve la transparencia de datos. Realizado por <a href="http://datosabiertoshn.com">Datos Abiertos</a>.
+				</p>
+			</div>
+		</div>
+
+		<script type="text/javascript" src="scripts/jquery-1.9.1.min.js"></script>
+		<script type="text/javascript" src="bootstrap/js/bootstrap.js"></script>
+
 		<script type='text/javascript'>
 			$(document).ready(function() {
-				
+
 				var apiBaseUrl = "http://" + location.host + "/";
-				var schoolsCollectionId = "525975a7d709f67801000003";
+				var schoolsCollectionId = "528fbdf1a5901f7d3a000005";
+				var schoolDays = "528fbe4fa5901f7d3a00000a";
+				var token = "528fbdaba5901f7d3a000001";
 
-				var schoolDays = "5259762dd709f6780100000b";
-				var token = "5262a1ca689515c720000004";
-				var username = 'test';
-				var password = 'testpass123';
-
-				var login = function(username, password, token) {
+				var login = function(token) {
 					return $.ajax({
 						type : "GET",
 						cache : false,
-						url : apiBaseUrl + 'api/auth?token=' + token,
-						username : username,
-						password : password
+						url : apiBaseUrl + 'api/auth?token=' + token
+					}).fail(function() {
+						$("#loginFailed").show();
 					});
 				};
 
-				login(username, password, token).then(function(user) {
+				login(token).then(function(user) {
 
-					console.log(user);
+					$("#workerName").html(user.name);
 
 					var date = new Date();
+					var schoolId;
 
-					$("#today").html(date);
+					$("#today").html(getShortDate(date));
 
 					//Populate schools drop-down
 					var query = {
 						$where : "(this.Workers||'').indexOf('" + user.username + "')>-1"
 					};
 					$.get(apiBaseUrl + 'collections/' + schoolsCollectionId + '/documents' + '?query=' + JSON.stringify(query)).then(function(schools) {
-						if (schools.length == 0) {
-							alert("No schools found for " + user.username + "!");
+
+						if (schools.length === 0) {
+							$("#dataEntry").hide();
+							$("#sorryNoSchools").show();
+						} else if (schools.length === 1) {
+							$("#dataEntry").show();
+							$("#singleSchool").show();
+							schoolId = schools[0]._id;
+							$("#school").html(schools[0].Name);
+						} else {
+							$("#dataEntry").show();
+							$("#multipleSchools").show();
+							var schoolOptions = $("#schools");
+							$.each(schools, function() {
+								schoolOptions.append($("<option />").val(this._id).text(this.Name));
+							});
 						}
-						var schoolOptions = $("#schools");
-						console.log(schools.length);
-						$.each(schools, function() {
-							schoolOptions.append($("<option />").val(this._id).text(this.Name));
-						});
+
+					});
+
+					var isOpen = false;
+					var isClosed = false;
+					$("#setOpen").click(function() {
+						$("#setOpen").addClass("btn-success");
+						$("#setClosed").removeClass("btn-warning");
+						isOpen = true;
+					});
+
+					$("#setClosed").click(function() {
+						$("#setClosed").addClass("btn-warning");
+						$("#setOpen").removeClass("btn-success");
+						isClosed = true;
 					});
 
 					$("#send").click(function() {
 
-						var shortDate = (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
-						var objToSend = {
-							'School Id' : $("#schools").val(),
-							'Date' : shortDate,
-							'Open' : $("input:radio[name='open']:checked").val()
+						if (!isOpen && !isClosed) {
+							alert("Please select whether or not this school is open or closed.");
+							return;
+						}
+
+						schoolId = schoolId || $("#schools").val();
+						var shortDate = getShortDate(date);
+
+						var query = {
+							$where : encodeURIComponent("this['School Id']==='" + schoolId + "' && this.Date==='" + shortDate + "'")
 						};
 
-						$.post(apiBaseUrl + 'collections/' + schoolDays + '/documents', objToSend).then(function() {
-							$("#form").hide();
-							$("#thanks").show();
+						$.get(apiBaseUrl + 'collections/' + schoolDays + '/documents' + '?query=' + JSON.stringify(query)).then(function(days) {
+							if (days.length === 0) {
+								sendDayReport(schoolId, shortDate, isOpen, user.username);
+							} else {
+								$("#schoolAlreadyReportedToday").show();
+								$("#dataEntry").hide();
+							}
+
 						});
 
 					});
-				});
 
+					function sendDayReport(schoolId, date, isOpen, worker) {
+
+						var objToSend = {
+							'School Id' : schoolId,
+							'Date' : date,
+							'Open' : isOpen,
+							'Worker' : worker,
+							'ReportedAt' : new Date()
+						};
+
+						$.post(apiBaseUrl + 'collections/' + schoolDays + '/documents', objToSend).then(function() {
+							$("#dataEntry").hide();
+							$("#thanks").show();
+						});
+
+					}
+
+					function getShortDate(date) {
+						return (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
+					}
+
+				});
 			});
 		</script>
 	</body>

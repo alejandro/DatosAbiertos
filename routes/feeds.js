@@ -18,14 +18,14 @@ module.exports.init = function(app) {
 	});
 
 	app.post('/feeds/:feedId/collections', function(req, res) {
-		feedModule.addCollection(req.user._id, req.params.feedId, req.body.name).then(function() {
+		feedModule.addCollection(req.user._id, req.params.feedId, req.body.name, req.body.code).then(function() {
 			res.json({
 				status : 'ok'
 			});
 		});
 	});
 
-	app.post('/feeds/:feedId/collections/:collectionId/fields', function(req, res) {		
+	app.post('/feeds/:feedId/collections/:collectionId/fields', function(req, res) {
 		feedModule.addField(req.user._id, req.params.feedId, req.params.collectionId, req.body.name, req.body.dataType, req.body.rules).then(function() {
 			res.json({
 				status : 'ok'
@@ -35,6 +35,14 @@ module.exports.init = function(app) {
 
 	app.put('/feeds/:feedId/collections/:collectionId/fields/:fieldId', function(req, res) {
 		feedModule.modifyField(req.user._id, req.params.feedId, req.params.collectionId, req.params.fieldId, req.body.name, req.body.dataType, req.body.rules).then(function() {
+			res.json({
+				status : 'ok'
+			});
+		});
+	});
+
+	app.put('/feeds/:feedId/collections/:collectionId/code/:newCode', function(req, res) {
+		feedModule.changeCollectionCode(req.user._id, req.params.feedId, req.params.collectionId, req.params.newCode).then(function() {
 			res.json({
 				status : 'ok'
 			});

@@ -3,9 +3,8 @@
         <h3>Create a New Collection</h3>
     </div>
     <div class="modal-body">
-        <form data-bind="submit: create">
-        	Collection name: <input data-bind="value: name"/>
-        </form>
+        <p>Collection name: <input data-bind="value: name"/></p>
+        <p>Url segment: <input data-bind="value: code"/></p>        
     </div>
     <div class="modal-footer">
         <button class="btn btn-primary" data-bind="click: create">Create</button>

@@ -1,9 +1,10 @@
 'use strict';
 
+var orgs = require('../modules/orgs.js');
 var database = require('../modules/database.js');
-var q        = require('q');
-var _        = require('underscore');
-var feeds    = 'feeds';
+var q = require('q');
+var _ = require('underscore');
+var feeds = 'feeds';
 
 var mod = function() {
 
@@ -20,14 +21,19 @@ var mod = function() {
 	var getAllByOrgId = function(orgId) {
 		return getCollection().then(function(col) {
 			return col.getAll({
-				orgId : orgId.toString()
+				orgId: orgId.toString()
 			});
 		});
 	};
 
 	var getOne = function(id) {
 		return getCollection().then(function(col) {
-			return col.getById(id);
+			return col.getById(id).then(function(feed) {
+				return orgs.getById(feed.orgId).then(function(org) {
+					feed.org = org;
+					return feed;
+				});
+			});
 		});
 	};
 
@@ -40,8 +46,8 @@ var mod = function() {
 	var create = function(userId, name, orgId) {
 		return getCollection().then(function(col) {
 			return col.add(userId, {
-				name : name,
-				orgId : orgId.toString()
+				name: name,
+				orgId: orgId.toString()
 			});
 		});
 	};
@@ -49,12 +55,12 @@ var mod = function() {
 	var correctName = function(userId, id, correctedName) {
 		return getCollection().then(function(col) {
 			return col.modify(userId, id, {
-				name : correctedName
+				name: correctedName
 			});
 		});
 	};
 
-	var addCollection = function(userId, feedId, collectionName) {
+	var addCollection = function(userId, feedId, collectionName, code) {
 
 		if (!collectionName) {
 			var def = q.defer();
@@ -66,12 +72,13 @@ var mod = function() {
 			return col.getById(feedId).then(function(feed) {
 				var collections = feed.collections || [];
 				collections.push({
-					_id : database.newId(),
-					name : collectionName
+					_id: database.newId(),
+					name: collectionName,
+					code: code
 				});
 
 				return col.modify(userId, feedId, {
-					collections : collections
+					collections: collections
 				});
 			});
 		});
@@ -86,8 +93,8 @@ var mod = function() {
 
 						var fields = c.fields || [];
 						fields.push({
-							_id : database.newId(),
-							name : name,
+							_id: database.newId(),
+							name: name,
 							dataType: dataType || 'text',
 							rules: rules || []
 						});
@@ -97,7 +104,25 @@ var mod = function() {
 				});
 
 				return col.modify(userId, feedId, {
-					collections : collections
+					collections: collections
+				});
+			});
+		});
+	};
+
+	var changeCollectionCode = function(userId, feedId, collectionId, newCode) {
+		return getCollection().then(function(col) {
+			return col.getById(feedId).then(function(feed) {
+
+				var collections = _.map(feed.collections, function(c) {
+					if (c._id.toString() == collectionId.toString()) {
+						c.code = newCode;
+					}
+					return c;
+				});
+
+				return col.modify(userId, feedId, {
+					collections: collections
 				});
 			});
 		});
@@ -127,22 +152,23 @@ var mod = function() {
 				});
 
 				return col.modify(userId, feedId, {
-					collections : collections
+					collections: collections
 				});
 			});
 		});
 	};
 
 	return {
-		getAll : getAll,
-		getAllByOrgId : getAllByOrgId,
-		get : getOne,
-		archive : archive,
-		create : create,
-		correctName : correctName,
-		addCollection : addCollection,
-		addField : addField,
-		modifyField : modifyField
+		getAll: getAll,
+		getAllByOrgId: getAllByOrgId,
+		get: getOne,
+		archive: archive,
+		create: create,
+		correctName: correctName,
+		addCollection: addCollection,
+		addField: addField,
+		modifyField: modifyField,
+		changeCollectionCode: changeCollectionCode
 	};
 }();
 

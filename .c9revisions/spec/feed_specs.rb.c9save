@@ -1,2 +1,0 @@
-{"ts":1366848781562,"silentsave":true,"restoring":false,"patch":[[]],"length":0}
-{"contributors":["byron@acklenavenue.com"],"silentsave":false,"ts":1366849148757,"patch":[[{"diffs":[[1,"# feed_specs.rb\nrequire 'feeds'\n\ndescribe Feeds, \"#list\" do\n  it \"should return a list of feeds\" do\n    feeds = Feeds.new\n    \n  end\nend"]],"start1":0,"start2":0,"length1":0,"length2":136}]],"length":136,"saved":false}

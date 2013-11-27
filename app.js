@@ -1,8 +1,6 @@
 'use strict';
 
 var express      = require('express');
-var mongoConnect = require('connect-mongodb');
-
 var app          = express();
 var database     = require('./modules/database.js');
 var auth         = require('./auth');
@@ -19,7 +17,6 @@ database.connect(cfg.db.host, cfg.db.port, cfg.db.name).then(function() {
 		app.use(express.bodyParser());
 		app.set('port', cfg.port);
 		app.use(express.cookieParser());
-		console.log('Setting up session mgt...');
 		app.use(express.cookieSession({
 			secret: 'cafe el gringo'
 		}));
@@ -35,3 +32,10 @@ database.connect(cfg.db.host, cfg.db.port, cfg.db.name).then(function() {
 		console.log('DatosAbiertos API Server listening on port %d', this.address().port);
 	});
 });
+
+process.on('uncaughtException', function (err) {
+  console.error(new Date().toUTCString() + ' uncaughtException:', err.message);
+  console.error(err.stack);
+  process.exit(1);
+});
+

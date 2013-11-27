@@ -1,0 +1,16 @@
+<div class="messageBox">
+    <div class="modal-header">
+        <h3>Add Admin to Org</h3>
+    </div>
+    <div class="modal-body">
+    	Search by email: <input data-bind="value: emailAddress"/><button data-bind="click: search">Search</button>
+    	
+    	<ul data-bind="foreach: users">
+    		<li><a href="#" data-bind="click: $parent.add"><span data-bind="html: displayName"></span></a></li>
+    	</ul>    
+    </div>
+    <div class="modal-footer">
+        <!-- <button class="btn btn-primary" data-bind="click: addByEmail">Add</button> -->
+    </div>
+</div>
+
